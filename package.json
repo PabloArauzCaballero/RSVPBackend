@@ -1,0 +1,28 @@
+{
+  "name": "@rsvp/backend",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "yarn@4.10.3",
+  "engines": {
+    "node": ">=24.18.1 <25",
+    "yarn": ">=4.10.3 <5"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "check": "yarn build && yarn lint && yarn test",
+    "contracts:validate": "yarn workspace @rsvp/contracts-openapi validate && yarn workspace @rsvp/contracts-asyncapi validate",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:verify": "powershell -ExecutionPolicy Bypass -File scripts/verify-infra.ps1"
+  },
+  "devDependencies": {
+    "turbo": "2.5.6",
+    "typescript": "5.9.2"
+  }
+}

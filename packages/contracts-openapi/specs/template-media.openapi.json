@@ -1,0 +1,6 @@
+{
+  "openapi": "3.1.0", "info": {"title": "RSVP Template and Media API", "version": "1.0.0"}, "servers": [{"url": "http://localhost:8000/media"}],
+  "paths": {"/health": {"get": {"responses": {"200": {"description": "Healthy"}}}}, "/templates": {"get": {"operationId": "listTemplates", "responses": {"200": {"description": "Templates"}}}, "post": {"operationId": "createTemplate", "responses": {"201": {"description": "Created"}, "401": {"$ref": "#/components/responses/Unauthorized"}, "422": {"$ref": "#/components/responses/Validation"}}}}, "/uploads/presign": {"post": {"operationId": "createPresignedUpload", "responses": {"201": {"description": "Presigned URL"}, "422": {"$ref": "#/components/responses/Validation"}}}}},
+  "components": {"schemas": {"Problem": {"type": "object", "required": ["type", "title", "status"], "properties": {"type": {"type": "string"}, "title": {"type": "string"}, "status": {"type": "integer"}}}}, "responses": {"Unauthorized": {"description": "Unauthorized"}, "Validation": {"description": "Invalid MIME type or upload size"}}}
+}
+

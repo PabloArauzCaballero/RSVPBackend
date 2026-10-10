@@ -1,0 +1,10 @@
+{
+  "name": "@rsvp/platform-testing",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node ../../scripts/workspace-check.mjs build",
+    "lint": "node ../../scripts/workspace-check.mjs lint",
+    "test": "node ../../scripts/workspace-check.mjs test"
+  }
+}

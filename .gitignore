@@ -1,0 +1,15 @@
+.yarn/cache
+.yarn/install-state.gz
+.pnp.*
+node_modules
+.turbo
+dist
+build
+coverage
+.env
+*.log
+.DS_Store
+apps/template-media-service/.venv
+apps/identity-service/.gradle
+apps/identity-service/build
+apps/identity-service/bin

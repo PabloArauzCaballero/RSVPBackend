@@ -1,0 +1,21 @@
+name: Publish contracts
+on:
+  push:
+    tags: ['contracts-v*']
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version-file: .nvmrc, registry-url: https://npm.pkg.github.com}
+      - run: corepack enable && yarn install --immutable && yarn contracts:validate
+      - run: yarn npm publish --access restricted
+        env:
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

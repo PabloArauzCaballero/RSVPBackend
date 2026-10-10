@@ -1,0 +1,81 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: local-status
+    url: http://kong:8001/status
+    routes:
+      - name: status
+        paths: ["/health"]
+        strip_path: false
+  - name: identity-service
+    url: http://identity-service:8080
+    routes:
+      - name: identity
+        paths: ["/identity"]
+        strip_path: true
+  - name: celebration-site-service
+    url: http://celebration-site-service:3001
+    routes:
+      - name: celebrations
+        paths: ["/celebrations"]
+        strip_path: false
+  - name: template-media-service
+    url: http://template-media-service:8002
+    routes:
+      - name: media
+        paths: ["/media"]
+        strip_path: true
+  - name: guest-rsvp-service
+    url: http://guest-rsvp-service:3002
+    routes:
+      - name: guests
+        paths: ["/guests"]
+        strip_path: false
+      - name: public-rsvp
+        paths: ["/rsvp"]
+        strip_path: false
+        plugins:
+          - name: rate-limiting
+            config: {minute: 30, policy: local, limit_by: ip}
+  - name: notification-service
+    url: http://notification-service:3003
+    routes:
+      - name: notifications
+        paths: ["/notifications"]
+        strip_path: false
+  - name: gift-list-service
+    url: http://gift-list-service:3004
+    routes:
+      - name: gifts
+        paths: ["/gifts"]
+        strip_path: false
+  - name: provider-catalog-service
+    url: http://provider-catalog-service:3005
+    routes:
+      - name: providers
+        paths: ["/providers"]
+        strip_path: false
+      - name: partner-redirect
+        paths: ["/r"]
+        strip_path: false
+        plugins:
+          - name: rate-limiting
+            config: {minute: 60, policy: local, limit_by: ip}
+
+plugins:
+  - name: correlation-id
+    config:
+      header_name: X-Correlation-Id
+      generator: uuid#counter
+      echo_downstream: true
+  - name: cors
+    config:
+      origins: ["http://localhost:3000", "http://localhost:8081"]
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+      headers: ["Authorization", "Content-Type", "X-Correlation-Id"]
+      exposed_headers: ["X-Correlation-Id"]
+      credentials: true
+  - name: request-size-limiting
+    config:
+      allowed_payload_size: 10

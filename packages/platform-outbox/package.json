@@ -1,0 +1,13 @@
+{
+  "name": "@rsvp/platform-outbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "yarn exec tsc -p tsconfig.json",
+    "lint": "yarn exec tsc -p tsconfig.json --noEmit",
+    "test": "yarn build && node --test test/*.test.mjs"
+  }
+}

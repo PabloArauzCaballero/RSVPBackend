@@ -1,0 +1,10 @@
+{
+  "openapi": "3.1.0", "info": {"title": "RSVP Guest and RSVP API", "version": "1.0.0"}, "servers": [{"url": "http://localhost:8000/guests"}],
+  "paths": {
+    "/health": {"get": {"responses": {"200": {"description": "Healthy"}}}},
+    "/celebrations/{celebrationId}/guests": {"post": {"operationId": "registerGuest", "responses": {"201": {"description": "Guest registered"}, "404": {"$ref": "#/components/responses/NotFound"}, "422": {"$ref": "#/components/responses/Validation"}}}},
+    "/rsvp/{token}": {"get": {"operationId": "getRsvpByToken", "responses": {"200": {"description": "RSVP"}, "401": {"$ref": "#/components/responses/Unauthorized"}, "404": {"$ref": "#/components/responses/NotFound"}}}, "patch": {"operationId": "respondToRsvp", "responses": {"200": {"description": "RSVP updated"}, "401": {"$ref": "#/components/responses/Unauthorized"}, "409": {"$ref": "#/components/responses/RsvpWindowClosed"}, "422": {"$ref": "#/components/responses/Validation"}}}}
+  },
+  "components": {"schemas": {"Problem": {"type": "object", "required": ["type", "title", "status"], "properties": {"type": {"type": "string"}, "title": {"type": "string"}, "status": {"type": "integer"}}}}, "responses": {"Unauthorized": {"description": "Unknown or revoked token"}, "NotFound": {"description": "Tenant-scoped resource not found"}, "Validation": {"description": "Invalid RSVP input"}, "RsvpWindowClosed": {"description": "RSVP deadline elapsed"}}}
+}
+

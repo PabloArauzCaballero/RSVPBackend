@@ -1,0 +1,12 @@
+{
+  "name": "@rsvp/celebration-site-service",
+  "version": "1.0.0",
+  "private": true,
+  "rsvpRuntime": "node-nestjs",
+  "scripts": {
+    "build": "node ../../scripts/workspace-check.mjs build",
+    "lint": "node ../../scripts/workspace-check.mjs lint",
+    "test": "node ../../scripts/workspace-check.mjs test",
+    "health": "node ../../scripts/workspace-check.mjs test"
+  }
+}

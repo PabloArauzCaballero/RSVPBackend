@@ -1,0 +1,147 @@
+name: rsvp-local
+
+services:
+  postgres:
+    image: postgres:17.6-alpine3.22
+    environment:
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-local-postgres-password}
+      POSTGRES_DB: postgres
+    ports: ["5432:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init/01-databases.sql:/docker-entrypoint-initdb.d/01-databases.sql:ro
+      - ./postgres/init/02-roles-and-rls.sql:/docker-entrypoint-initdb.d/02-roles-and-rls.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:4.1.4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-local-rabbitmq}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-local-rabbitmq-password}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"
+    ports: ["5672:5672", "15672:15672"]
+    volumes:
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:8.2.1-alpine3.22
+    command: ["redis-server", "--appendonly", "yes"]
+    ports: ["6379:6379"]
+    volumes: ["redis_data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  minio:
+    image: quay.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-local-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-local-minio-password}
+    ports: ["9000:9000", "9001:9001"]
+    volumes: ["minio_data:/data"]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  minio-init:
+    image: quay.io/minio/aistor/mc@sha256:6c33dc0fbf65c362be95003cd010ed95a41c556500833ea139f86de40c4c4e9f
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-local-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-local-minio-password}
+    entrypoint: >-
+      /bin/sh -c "mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD && mc mb --ignore-existing local/rsvp-media"
+    restart: "no"
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports: ["1025:1025", "8025:8025"]
+
+  kong:
+    image: kong:3.9.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    ports: ["8000:8000", "8001:8001"]
+    volumes:
+      - ./kong/kong.yml:/usr/local/kong/declarative/kong.yml:ro
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.137.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./observability/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports: ["4317:4317", "4318:4318", "8889:8889"]
+    depends_on: [tempo, loki]
+
+  prometheus:
+    image: prom/prometheus:v3.6.0
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus"]
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports: ["9090:9090"]
+
+  tempo:
+    image: grafana/tempo:2.8.2
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./observability/tempo.yaml:/etc/tempo.yaml:ro
+      - tempo_data:/var/tempo
+    ports: ["3200:3200"]
+
+  loki:
+    image: grafana/loki:3.5.5
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    volumes:
+      - ./observability/loki.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    ports: ["3100:3100"]
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-local-grafana-password}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    ports: ["3000:3000"]
+    depends_on: [prometheus, tempo, loki]
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  prometheus_data:
+  tempo_data:
+  loki_data:
+  grafana_data:

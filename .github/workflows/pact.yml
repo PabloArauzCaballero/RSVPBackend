@@ -1,0 +1,19 @@
+name: Pact verification
+on:
+  pull_request:
+    paths: ['packages/contracts-openapi/**', 'packages/contracts-asyncapi/**', 'contracts/pacts/**']
+
+jobs:
+  contract-catalog:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version-file: .nvmrc, cache: yarn}
+      - run: corepack enable && yarn install --immutable && yarn contracts:validate
+      - name: Pact Broker gate
+        run: |
+          test -n "${PACT_BROKER_BASE_URL:-}" || { echo 'PACT_BROKER_BASE_URL must be configured in repository variables before Pact publication.'; exit 1; }
+        env:
+          PACT_BROKER_BASE_URL: ${{ vars.PACT_BROKER_BASE_URL }}
+

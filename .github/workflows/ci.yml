@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Affected workspace quality
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version-file: .nvmrc, cache: yarn}
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: yarn contracts:validate
+      - run: yarn turbo run build lint test --affected
+
+  runtimes:
+    name: Runtime ${{ matrix.runtime }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, java, python]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version-file: .nvmrc, cache: yarn}
+      - uses: actions/setup-java@v4
+        if: matrix.runtime == 'java'
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        if: matrix.runtime == 'python'
+        with: {python-version: '3.14'}
+      - run: corepack enable && yarn install --immutable
+      - run: yarn workspace @rsvp/identity-service test
+        if: matrix.runtime == 'java'
+      - run: yarn turbo run test --filter='@rsvp/*'
+        if: matrix.runtime != 'java'
+
+  secret-scan:
+    name: Gitleaks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
