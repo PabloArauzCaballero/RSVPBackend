@@ -1,0 +1,6 @@
+CREATE TABLE provider (id UUID PRIMARY KEY, owner_id UUID NOT NULL, status TEXT NOT NULL, plan TEXT NOT NULL, currency CHAR(3) NOT NULL DEFAULT 'BOB', time_zone TEXT NOT NULL);
+CREATE TABLE service_listing (id UUID PRIMARY KEY, provider_id UUID NOT NULL REFERENCES provider(id), category TEXT NOT NULL, destinations JSONB NOT NULL, fulfillment JSONB, published BOOLEAN NOT NULL DEFAULT FALSE);
+CREATE TABLE lead (id UUID PRIMARY KEY, listing_id UUID NOT NULL, provider_id UUID NOT NULL, destination TEXT NOT NULL, session_id TEXT NOT NULL, valid BOOLEAN NOT NULL, invalid_reason TEXT, correlation_id UUID NOT NULL, occurred_at TIMESTAMPTZ NOT NULL);
+CREATE TABLE booking_request (id UUID PRIMARY KEY, provider_id UUID NOT NULL, requested_date DATE NOT NULL, status TEXT NOT NULL, expires_at TIMESTAMPTZ NOT NULL);
+CREATE TABLE read_provider_metrics (provider_id UUID NOT NULL, day DATE NOT NULL, category TEXT NOT NULL, destination TEXT NOT NULL, impressions INTEGER NOT NULL DEFAULT 0, clicks INTEGER NOT NULL DEFAULT 0, valid_leads INTEGER NOT NULL DEFAULT 0, invalid_leads INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(provider_id, day, category, destination));
+-- rollback: DROP TABLE read_provider_metrics; DROP TABLE booking_request; DROP TABLE lead; DROP TABLE service_listing; DROP TABLE provider;

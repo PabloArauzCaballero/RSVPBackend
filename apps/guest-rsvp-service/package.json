@@ -4,9 +4,9 @@
   "private": true,
   "rsvpRuntime": "node-nestjs",
   "scripts": {
-    "build": "node ../../scripts/workspace-check.mjs build",
-    "lint": "node ../../scripts/workspace-check.mjs lint",
-    "test": "node ../../scripts/workspace-check.mjs test",
+    "build": "node --check src/index.mjs",
+    "lint": "node --check src/index.mjs && node --check test/guest-rsvp.test.mjs",
+    "test": "node --test test/guest-rsvp.test.mjs",
     "health": "node ../../scripts/workspace-check.mjs test"
   }
 }

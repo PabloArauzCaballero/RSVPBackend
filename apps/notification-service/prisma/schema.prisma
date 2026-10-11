@@ -1,0 +1,5 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+model DeviceToken { token String @id; userId String; platform String; disabledAt DateTime?; createdAt DateTime @default(now()); @@index([userId, disabledAt]) }
+model DeliveryAttempt { id String @id; token String; attempt Int; status String; errorCode String?; createdAt DateTime @default(now()) }
+model ProcessedNotificationEvent { id String @id; processedAt DateTime @default(now()) }

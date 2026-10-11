@@ -1,0 +1,4 @@
+// Prisma schema ownership: gift_db. SQL migration is intentionally explicit for optimistic version checks.
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("GIFT_DATABASE_URL") }
+model GiftItem { id String @id; listId String; status String; source String; version Int @default(0); priceMinor Int; currency String }

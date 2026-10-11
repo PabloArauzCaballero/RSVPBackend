@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "rsvpRuntime": "node-nestjs",
+  "type": "module",
   "scripts": {
-    "build": "node ../../scripts/workspace-check.mjs build",
-    "lint": "node ../../scripts/workspace-check.mjs lint",
-    "test": "node ../../scripts/workspace-check.mjs test",
+    "build": "yarn exec tsc -p tsconfig.json",
+    "lint": "yarn exec tsc -p tsconfig.json --noEmit",
+    "test": "yarn build && node --test test/*.test.mjs",
     "health": "node ../../scripts/workspace-check.mjs test"
   }
 }

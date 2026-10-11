@@ -1,0 +1,8 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+model Guest { id String @id; celebrationId String; email String; name String; locale String?; allowedCompanions Int; groupId String?; consentGivenAt DateTime; erasedAt DateTime?; @@index([celebrationId, email]) }
+model GuestAccessToken { hash String @id; guestId String; celebrationId String; revokedAt DateTime?; createdAt DateTime @default(now()); @@index([guestId]) }
+model Rsvp { guestId String @id; status String; dietaryNotes String?; message String?; requestedCompanions Int @default(0); approvedCompanions Int @default(0) }
+model ReadGuestList { celebrationId String; guestId String @id; status String; groupId String?; name String; approvedCompanions Int; updatedAt DateTime @updatedAt; @@index([celebrationId, status, groupId]); @@index([celebrationId, name]) }
+model ProcessedProjectionEvent { id String @id; processedAt DateTime @default(now()) }

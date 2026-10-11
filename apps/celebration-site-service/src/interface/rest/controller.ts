@@ -1,0 +1,3 @@
+import { DomainError } from '../../domain/errors.js';
+import type { CelebrationService } from '../../application/service.js';
+export function publishCelebration(service: CelebrationService, request: { celebrationId: string; tenantId: string; actorId: string; correlationId: string; expectedVersion: number; now: string }): { status: number; body: unknown } { try { const value = service.publish(request.celebrationId, request.tenantId, request.actorId, request.correlationId, request.now, request.expectedVersion); return { status: 200, body: value }; } catch (error) { if (error instanceof DomainError) return { status: error.code, body: { message: error.message, missingFields: 'missingFields' in error ? error.missingFields : undefined } }; throw error; } }

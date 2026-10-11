@@ -4,9 +4,9 @@
   "private": true,
   "rsvpRuntime": "python-django",
   "scripts": {
-    "build": "node ../../scripts/workspace-check.mjs build",
-    "lint": "node ../../scripts/workspace-check.mjs lint",
-    "test": "node ../../scripts/workspace-check.mjs test",
+    "build": "python -m compileall -q templates_app media_app outbox",
+    "lint": "python -m compileall -q templates_app media_app outbox",
+    "test": "python -m unittest discover -s tests -p \"test_*.py\"",
     "health": "node ../../scripts/workspace-check.mjs test"
   }
 }
