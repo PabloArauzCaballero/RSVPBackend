@@ -1,0 +1,1 @@
+{"annotations":{"list":[]},"editable":false,"panels":[{"datasource":{"type":"loki","uid":"Loki"},"targets":[{"expr":"{service_name=\"identity-service\"}","refId":"A"}],"title":"Identity logs","type":"logs"}],"schemaVersion":39,"title":"RSVP Identity","version":1}

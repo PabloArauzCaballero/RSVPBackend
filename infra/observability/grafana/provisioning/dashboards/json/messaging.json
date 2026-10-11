@@ -1,0 +1,1 @@
+{"annotations":{"list":[]},"editable":false,"panels":[{"datasource":{"type":"prometheus","uid":"Prometheus"},"targets":[{"expr":"max(rsvp_parking_queue_depth)","refId":"A"}],"title":"Parking queue depth","type":"stat"}],"schemaVersion":39,"title":"RSVP Messaging","version":1}

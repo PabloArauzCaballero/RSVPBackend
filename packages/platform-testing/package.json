@@ -2,9 +2,12 @@
   "name": "@rsvp/platform-testing",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "node ../../scripts/workspace-check.mjs build",
-    "lint": "node ../../scripts/workspace-check.mjs lint",
-    "test": "node ../../scripts/workspace-check.mjs test"
+    "build": "yarn exec tsc -p tsconfig.json",
+    "lint": "yarn exec tsc -p tsconfig.json --noEmit",
+    "test": "yarn build && node --test test/*.test.mjs"
   }
 }

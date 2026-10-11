@@ -19,11 +19,17 @@ export function assertRoutingKey(routingKey: string): void {
 export function assertEnvelope(value: unknown): asserts value is EventEnvelope {
   if (typeof value !== 'object' || value === null) throw new Error('Event envelope must be an object.');
   const envelope = value as Partial<EventEnvelope>;
-  if (!envelope.eventId || !envelope.eventName || !envelope.occurredAt || !envelope.correlationId) {
+  const { eventId, eventName, occurredAt, correlationId } = envelope;
+  if ([eventId, eventName, occurredAt, correlationId].some((field) => typeof field !== 'string' || field.trim().length === 0)) {
     throw new Error('Event envelope requires eventId, eventName, occurredAt and correlationId.');
   }
-  assertRoutingKey(envelope.eventName);
-  if (!envelope.tenant || typeof envelope.tenant.celebrationId !== 'string' || !envelope.tenant.celebrationId) {
+  // TypeScript cannot infer narrowing through Array#some, although the guard above
+  // establishes that all four fields are non-empty strings.
+  if (typeof occurredAt !== 'string' || typeof eventName !== 'string') throw new Error('Invalid event envelope.');
+  if (!Number.isFinite(Date.parse(occurredAt))) throw new Error('Event envelope occurredAt must be an ISO date-time.');
+  assertRoutingKey(eventName);
+  if (!envelope.tenant || typeof envelope.tenant.celebrationId !== 'string' || !envelope.tenant.celebrationId.trim()) {
     throw new Error('Event envelope requires tenant.celebrationId.');
   }
+  if (!Object.hasOwn(envelope, 'payload') || envelope.payload === undefined) throw new Error('Event envelope requires payload.');
 }

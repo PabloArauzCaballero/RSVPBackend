@@ -1,0 +1,1 @@
+{"annotations":{"list":[]},"editable":false,"panels":[{"datasource":{"type":"prometheus","uid":"Prometheus"},"targets":[{"expr":"max(rsvp_outbox_lag_seconds)","refId":"A"}],"title":"Outbox lag (seconds)","type":"timeseries"}],"schemaVersion":39,"title":"RSVP Outbox","version":1}

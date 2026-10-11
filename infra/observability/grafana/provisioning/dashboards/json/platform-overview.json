@@ -1,0 +1,1 @@
+{"annotations":{"list":[]},"editable":false,"panels":[{"datasource":{"type":"prometheus","uid":"Prometheus"},"targets":[{"expr":"sum(rsvp_leads_total)","refId":"A"}],"title":"Leads","type":"stat"}],"schemaVersion":39,"title":"RSVP Platform Overview","version":1}

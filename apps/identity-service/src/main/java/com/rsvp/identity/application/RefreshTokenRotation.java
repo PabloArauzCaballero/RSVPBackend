@@ -28,6 +28,12 @@ public final class RefreshTokenRotation {
         return issue(state.userId(), state.chainId());
     }
 
+    /** Logout is deliberately idempotent: a stale token must not reveal session state. */
+    public void logout(String presentedToken) {
+        var state = repository.find(TokenHash.sha256(presentedToken));
+        state.ifPresent(token -> repository.revokeChain(token.chainId()));
+    }
+
     private String issue(UUID userId, UUID chainId) {
         byte[] bytes = new byte[48]; random.nextBytes(bytes);
         String raw = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);

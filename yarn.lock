@@ -56,9 +56,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@rsvp/contracts-types@workspace:packages/contracts-types":
+"@rsvp/contracts@workspace:packages/contracts-types":
   version: 0.0.0-use.local
-  resolution: "@rsvp/contracts-types@workspace:packages/contracts-types"
+  resolution: "@rsvp/contracts@workspace:packages/contracts-types"
   languageName: unknown
   linkType: soft
 

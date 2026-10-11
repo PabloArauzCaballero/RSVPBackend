@@ -1,10 +1,22 @@
 {
-  "name": "@rsvp/contracts-types",
+  "name": "@rsvp/contracts",
   "version": "1.0.0",
-  "private": true,
+  "type": "module",
+  "exports": "./index.js",
+  "types": "./index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
   "scripts": {
     "build": "node ../../scripts/workspace-check.mjs build",
     "lint": "node ../../scripts/workspace-check.mjs lint",
-    "test": "node ../../scripts/workspace-check.mjs test"
+    "test": "node ../../scripts/workspace-check.mjs test",
+    "prepublishOnly": "node ../../scripts/workspace-check.mjs build"
   }
 }

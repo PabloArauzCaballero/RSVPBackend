@@ -13,6 +13,8 @@
 3. Ejecutá `corepack yarn install` y luego `docker compose up -d` desde la raíz.
 4. Confirmá con `docker compose ps` que Postgres, RabbitMQ, Redis, MinIO y Kong estén saludables.
 
+Validá el stack con `corepack yarn infra:verify`; el script comprueba servicios, las siete bases y los exchanges iniciales, e informa el recurso concreto que no respondió.
+
 Interfaces locales: Kong `:8000`, RabbitMQ `:15672`, MinIO `:9001`, MailHog `:8025`, Prometheus `:9090` y Grafana `:3000`.
 
 ## Limpieza y recuperación

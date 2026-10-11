@@ -1,0 +1,11 @@
+groups:
+  - name: rsvp-platform
+    rules:
+      - alert: RsvpParkingQueueNotEmpty
+        expr: rsvp_parking_queue_depth > 0
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "RSVP parking queue has messages"
+          description: "A consumer exhausted its retries; inspect the parking queue and replay only after fixing the cause."

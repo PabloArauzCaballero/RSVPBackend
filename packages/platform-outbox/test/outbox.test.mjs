@@ -26,10 +26,29 @@ test('replays retained events after a publisher outage', async () => {
   assert.equal(repository.snapshot()[0].status, 'PUBLISHED');
 });
 
+test('reclaims an event after a process dies while holding its lease', async () => {
+  const repository = new InMemoryOutboxRepository(1_000);
+  await repository.transaction((tx) => enqueueInTransaction(tx, event));
+  const claimedBeforeCrash = await repository.claim(1, new Date('2026-01-01T00:00:00Z'));
+  assert.equal(claimedBeforeCrash.length, 1);
+  const published = [];
+  const relay = new OutboxRelay(repository, { publish: async (outboxEvent) => { published.push(outboxEvent.id); } }, 3, () => new Date('2026-01-01T00:00:02Z'));
+  assert.deepEqual(await relay.relayBatch(), { published: 1, failed: 0 });
+  assert.deepEqual(published, ['evt-1']);
+});
+
 test('inbox performs exactly one effect for duplicate delivery', async () => {
   const inbox = new InMemoryInboxRepository();
   let effects = 0;
   await Promise.all([consumeOnce(inbox, 'event-1', async () => { effects += 1; }), consumeOnce(inbox, 'event-1', async () => { effects += 1; }), consumeOnce(inbox, 'event-1', async () => { effects += 1; })]);
+  assert.equal(effects, 1);
+});
+
+test('releases a failed inbox claim so delivery can be retried safely', async () => {
+  const inbox = new InMemoryInboxRepository();
+  await assert.rejects(consumeOnce(inbox, 'event-retry', async () => { throw new Error('temporary'); }));
+  let effects = 0;
+  assert.equal(await consumeOnce(inbox, 'event-retry', async () => { effects += 1; }), 'processed');
   assert.equal(effects, 1);
 });
 

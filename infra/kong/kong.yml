@@ -14,27 +14,32 @@ services:
       - name: identity
         paths: ["/identity"]
         strip_path: true
+        tags: ["rsvp-public"]
   - name: celebration-site-service
     url: http://celebration-site-service:3001
     routes:
       - name: celebrations
         paths: ["/celebrations"]
         strip_path: false
+        tags: ["rsvp-protected"]
   - name: template-media-service
     url: http://template-media-service:8002
     routes:
       - name: media
         paths: ["/media"]
         strip_path: true
+        tags: ["rsvp-protected"]
   - name: guest-rsvp-service
     url: http://guest-rsvp-service:3002
     routes:
       - name: guests
         paths: ["/guests"]
         strip_path: false
+        tags: ["rsvp-protected"]
       - name: public-rsvp
         paths: ["/rsvp"]
         strip_path: false
+        tags: ["rsvp-public"]
         plugins:
           - name: rate-limiting
             config: {minute: 30, policy: local, limit_by: ip}
@@ -44,21 +49,25 @@ services:
       - name: notifications
         paths: ["/notifications"]
         strip_path: false
+        tags: ["rsvp-protected"]
   - name: gift-list-service
     url: http://gift-list-service:3004
     routes:
       - name: gifts
         paths: ["/gifts"]
         strip_path: false
+        tags: ["rsvp-protected"]
   - name: provider-catalog-service
     url: http://provider-catalog-service:3005
     routes:
       - name: providers
         paths: ["/providers"]
         strip_path: false
+        tags: ["rsvp-protected"]
       - name: partner-redirect
         paths: ["/r"]
         strip_path: false
+        tags: ["rsvp-public"]
         plugins:
           - name: rate-limiting
             config: {minute: 60, policy: local, limit_by: ip}
