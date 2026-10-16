@@ -16,12 +16,18 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "check": "yarn build && yarn lint && yarn test",
+    "harness:validate": "node scripts/validate-harness.mjs",
     "contracts:validate": "yarn workspace @rsvp/contracts-openapi validate && yarn workspace @rsvp/contracts-asyncapi validate",
     "infra:up": "docker compose up -d",
     "infra:down": "docker compose down",
-    "infra:verify": "powershell -ExecutionPolicy Bypass -File scripts/verify-infra.ps1"
+    "infra:verify": "powershell -ExecutionPolicy Bypass -File scripts/verify-infra.ps1",
+    "graph:init": "codegraph init --yes",
+    "graph:status": "codegraph status",
+    "graph:sync": "codegraph sync",
+    "graph:probe": "node scripts/probe-codegraph-mcp.mjs"
   },
   "devDependencies": {
+    "@colbymchenry/codegraph": "1.6.2",
     "turbo": "2.5.6",
     "typescript": "5.9.2"
   }

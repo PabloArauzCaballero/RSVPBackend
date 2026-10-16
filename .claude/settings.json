@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/scripts/reload-skills.mjs", "claude"],
+            "timeout": 10000,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}

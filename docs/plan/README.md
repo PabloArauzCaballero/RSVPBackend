@@ -6,6 +6,8 @@ Plataforma de Celebraciones · Monorepo poliglota · DDD + CQRS + Hexagonal · E
 
 ## Cómo se lee esta carpeta
 
+**Revisión vigente (16-oct-2026):** lee [la replanificación por slices verticales](revision-vertical-slice-2026-10-16.md) antes de ejecutar el calendario o una ficha. Sus cortes y gates de UX/animación/CodeGraph prevalecen sobre las listas históricas por componentes. Las fechas H1–H6 siguen como objetivos y requieren reestimación con evidencia de capacidad; no equivalen a compromiso verificado.
+
 | Carpeta | Qué contiene | Cuándo la abrís |
 |---|---|---|
 | [`00-plan-maestro.md`](00-plan-maestro.md) | El plan completo: contexto, negocio, decisiones de arquitectura, modelo de dominio, infraestructura | Una vez al empezar. Es la referencia que no cambia |
@@ -69,5 +71,5 @@ yarn turbo run build lint test       # todo verde antes de tocar nada
 Y después, tu carril:
 
 ```
-/rsvp-master Ejecuta el carril NN completo
+Usa $rsvp-backend-lane para ejecutar el carril NN completo
 ```

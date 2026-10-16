@@ -1,3 +1,5 @@
+> **Replanificación vigente (16-oct-2026):** [slices verticales y gates de CodeGraph, UX/UI y animación](../revision-vertical-slice-2026-10-16.md). Las fechas y tareas de esta ficha son objetivos históricos sujetos a reestimación con evidencia de slices completos.
+
 # Semana 04 · Identidad, proyecciones y alta de partners
 
 **9 de noviembre al 13 de noviembre de 2026**

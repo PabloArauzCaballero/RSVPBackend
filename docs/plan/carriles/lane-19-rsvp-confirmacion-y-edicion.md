@@ -41,9 +41,23 @@ Cada requisito es falsable: o pasa su prueba, o no pasa. No hay interpretación.
 
 ---
 
-## Plan por slices
+## Primer slice vertical replanificado (16-oct-2026)
 
-Cada slice es vertical y termina con sus pruebas en verde. No se pasa al siguiente con el anterior rojo.
+**Resultado demostrable:** Confirmar una asistencia real con token y leer el estado actualizado; repetir la petición sin doble efecto.
+
+- **REQs:** relacionar el primer corte con los requisitos aplicables (REQ-19-01, REQ-19-02, REQ-19-03, REQ-19-04, REQ-19-05, REQ-19-06) en la evidencia antes de implementarlo; los demás se reparten en cortes posteriores. Este primer corte no cierra el carril.
+- **Frontera entre repos:** F15 frontend; coordinar contrato versionado y prueba de integración cuando el resultado la requiera.
+- **Prueba mínima:** caso de éxito y caso negativo en runtime pertinente, con comando/artefacto y resultado en la evidencia del carril. Un mock solo prueba su capa.
+- **Gates de interfaz:** N/A backend puro; coordinar F15 frontend si cambia UX. **Animación:** N/A salvo contrato que afecte transición.
+- **Descubrimiento:** consultar CodeGraph para flujo e impacto y confirmar en archivos actuales.
+
+Los puntos del inventario siguiente describen capacidades previstas, **no** slices verticales listos para ejecutar. Corta cada capacidad restante por comportamiento y cierra su prueba antes de avanzar; sigue [la revisión general](../revision-vertical-slice-2026-10-16.md).
+
+---
+
+## Inventario histórico de capacidades
+
+Esta lista conserva el inventario original por componentes. No representa slices ejecutables ni el orden de entrega.
 
 1. Agregado `Rsvp` y política de ventana temporal, con tests de reloj fijo.
 2. Comandos de confirmar, rechazar y cambiar, con eventos en outbox.
@@ -92,5 +106,5 @@ Y en todos los casos:
 ## Cómo se activa
 
 ```
-/rsvp-master Ejecuta el carril 19 completo
+Usa $rsvp-backend-lane para ejecutar el carril 19 completo
 ```

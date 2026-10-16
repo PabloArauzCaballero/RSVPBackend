@@ -1,0 +1,10 @@
+{
+  "exclude": [
+    ".agents/",
+    ".claude/",
+    ".gemini/",
+    ".codex/",
+    "docs/",
+    "**/vendor/"
+  ]
+}

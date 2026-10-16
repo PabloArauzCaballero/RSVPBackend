@@ -19,6 +19,7 @@ jobs:
         with: {node-version-file: .nvmrc, cache: yarn}
       - run: corepack enable
       - run: yarn install --immutable
+      - run: yarn harness:validate
       - run: yarn contracts:validate
       - run: yarn turbo run build lint test --affected
 

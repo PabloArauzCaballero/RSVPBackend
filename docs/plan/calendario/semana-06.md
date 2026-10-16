@@ -1,3 +1,5 @@
+> **Replanificación vigente (16-oct-2026):** [slices verticales y gates de CodeGraph, UX/UI y animación](../revision-vertical-slice-2026-10-16.md). Las fechas y tareas de esta ficha son objetivos históricos sujetos a reestimación con evidencia de slices completos.
+
 # Semana 06 · Plataforma de frontend y push
 
 **23 de noviembre al 27 de noviembre de 2026**

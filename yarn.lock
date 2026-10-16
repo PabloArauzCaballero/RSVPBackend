@@ -5,10 +5,82 @@ __metadata:
   version: 8
   cacheKey: 10c0
 
+"@colbymchenry/codegraph-darwin-arm64@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@colbymchenry/codegraph-darwin-arm64@npm:1.6.2"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@colbymchenry/codegraph-darwin-x64@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@colbymchenry/codegraph-darwin-x64@npm:1.6.2"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@colbymchenry/codegraph-linux-arm64@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@colbymchenry/codegraph-linux-arm64@npm:1.6.2"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@colbymchenry/codegraph-linux-x64@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@colbymchenry/codegraph-linux-x64@npm:1.6.2"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@colbymchenry/codegraph-win32-arm64@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@colbymchenry/codegraph-win32-arm64@npm:1.6.2"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@colbymchenry/codegraph-win32-x64@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@colbymchenry/codegraph-win32-x64@npm:1.6.2"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@colbymchenry/codegraph@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@colbymchenry/codegraph@npm:1.6.2"
+  dependencies:
+    "@colbymchenry/codegraph-darwin-arm64": "npm:1.6.2"
+    "@colbymchenry/codegraph-darwin-x64": "npm:1.6.2"
+    "@colbymchenry/codegraph-linux-arm64": "npm:1.6.2"
+    "@colbymchenry/codegraph-linux-x64": "npm:1.6.2"
+    "@colbymchenry/codegraph-win32-arm64": "npm:1.6.2"
+    "@colbymchenry/codegraph-win32-x64": "npm:1.6.2"
+  dependenciesMeta:
+    "@colbymchenry/codegraph-darwin-arm64":
+      optional: true
+    "@colbymchenry/codegraph-darwin-x64":
+      optional: true
+    "@colbymchenry/codegraph-linux-arm64":
+      optional: true
+    "@colbymchenry/codegraph-linux-x64":
+      optional: true
+    "@colbymchenry/codegraph-win32-arm64":
+      optional: true
+    "@colbymchenry/codegraph-win32-x64":
+      optional: true
+  bin:
+    codegraph: npm-shim.js
+  checksum: 10c0/0bb89af394de00e1b76994b7ee6eb38c58674e3690f97ecfa6947b057ae700b68027e5d956f1402d7f8211d9ffe687b81e8434a8252bac1e50f396146dee29e4
+  languageName: node
+  linkType: hard
+
 "@rsvp/backend@workspace:.":
   version: 0.0.0-use.local
   resolution: "@rsvp/backend@workspace:."
   dependencies:
+    "@colbymchenry/codegraph": "npm:1.6.2"
     turbo: "npm:2.5.6"
     typescript: "npm:5.9.2"
   languageName: unknown

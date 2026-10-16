@@ -1,3 +1,5 @@
+> **Replanificación vigente (16-oct-2026):** [slices verticales y gates de CodeGraph, UX/UI y animación](../revision-vertical-slice-2026-10-16.md). Las fechas y tareas de esta ficha son objetivos históricos sujetos a reestimación con evidencia de slices completos.
+
 # Pablo · Eje A — Plataforma + Identity
 
 > Sos el primero y el cuello de botella. Tus carriles `01`–`05` y `F01`–`F05` son predecesores de casi todo lo que hacen los otros tres. Si vos te atrasás, se atrasa el proyecto entero; si vos vas adelantado, los demás trabajan sin fricción.

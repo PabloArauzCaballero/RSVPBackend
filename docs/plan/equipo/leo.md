@@ -1,3 +1,5 @@
+> **Replanificación vigente (16-oct-2026):** [slices verticales y gates de CodeGraph, UX/UI y animación](../revision-vertical-slice-2026-10-16.md). Las fechas y tareas de esta ficha son objetivos históricos sujetos a reestimación con evidencia de slices completos.
+
 # Leo · Eje B — Celebración y Contenido
 
 > Sos dueño del agregado raíz. Todo lo que hacen Miguel y Fabio cuelga de una `Celebration`, y los switches `AUTO_ACCEPT / RESTRICTED` que vos publicás deciden el comportamiento de sus dominios. Tu carril 12 es predecesor del 20 de Miguel y del 27 de Fabio: hacelo temprano.

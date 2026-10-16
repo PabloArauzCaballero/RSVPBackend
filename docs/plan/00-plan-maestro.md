@@ -1,7 +1,11 @@
+> **Revisión vigente (16-oct-2026):** [replanificación por slices verticales](revision-vertical-slice-2026-10-16.md). Sus criterios de entrega, CodeGraph, UX/UI y animación prevalecen sobre secuencias por capas y calendario histórico de este documento.
+
 > Plan maestro del backend. Es la referencia estable del proyecto.
 > El reparto por persona está en [`equipo/`](equipo/), el calendario en [`calendario/`](calendario/)
 > y las órdenes de trabajo en [`carriles/`](carriles/).
 > El plan de frontend vive en `RSVPFrontend/docs/plan/`.
+
+> **Nota de ejecución vigente (2026-10-16):** el harness `.claude/` completo, `tareas/` y una skill por carril descritos abajo son el diseño histórico y no están implementados. `.claude/skills/` contiene adaptadores hacia las skills compartidas; sí existen hooks de recarga por prompt para Claude y Gemini. El flujo obligatorio actual está en [`AGENTS.md`](../../AGENTS.md), las skills de [`.agents/skills/`](../../.agents/skills/rsvp-backend-lane/SKILL.md), la [política de skills](../engineering/skills.md), las [convenciones](../engineering/convenciones.md) y las 36 fichas existentes en [`carriles/`](carriles/).
 
 ---
 
@@ -233,8 +237,8 @@ Se heredan de AloVida y se adaptan: lo que allá era Playwright/visual, acá es 
 
 ### 7.5 Cómo se ejecuta un carril
 
-1. Leer la ficha `tareas/TAREA-NN-*.md` **completa**, incluidos riesgos y preguntas abiertas.
-2. Activar: `/rsvp-master Ejecuta el carril NN completo`.
+1. Leer la ficha existente `docs/plan/carriles/lane-NN-*.md` **completa**, incluidos riesgos y preguntas abiertas.
+2. Aplicar `$rsvp-backend-lane`, `$rsvp-evidence` y las skills adicionales según el alcance.
 3. **Discovery factual antes de editar**: contratos existentes, migraciones, eventos ya declarados, qué hace el carril de referencia. Prohibido inventar.
 4. Implementar por **slices verticales pequeños**; tras cada slice: typecheck + lint + tests dirigidos.
 5. Si un test dirigido falla y es del carril: diagnosticar, corregir y **volver a ejecutar el mismo test**. No debilitar la aserción.

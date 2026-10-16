@@ -1,3 +1,5 @@
+> **Replanificación vigente (16-oct-2026):** [slices verticales y gates de CodeGraph, UX/UI y animación](../revision-vertical-slice-2026-10-16.md). Las fechas y tareas de esta ficha son objetivos históricos sujetos a reestimación con evidencia de slices completos.
+
 # Fabio · Eje D — El negocio
 
 > Tu eje es el que paga el proyecto. Todo lo demás existe para generar el tráfico que termina en un clic hacia un partner. Tenés 12 carriles de backend, más que nadie, porque Gift List y Provider Catalog son dos dominios completos y porque el marketplace sumó la agenda del proveedor.

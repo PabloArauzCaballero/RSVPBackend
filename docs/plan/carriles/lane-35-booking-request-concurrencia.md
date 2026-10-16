@@ -40,9 +40,23 @@ Cada requisito es falsable: o pasa su prueba, o no pasa. No hay interpretación.
 
 ---
 
-## Plan por slices
+## Primer slice vertical replanificado (16-oct-2026)
 
-Cada slice es vertical y termina con sus pruebas en verde. No se pasa al siguiente con el anterior rojo.
+**Resultado demostrable:** Solicitar una fecha disponible y provocar dos reservas concurrentes; una recibe conflicto.
+
+- **REQs:** relacionar el primer corte con los requisitos aplicables (REQ-35-01, REQ-35-02, REQ-35-03, REQ-35-04, REQ-35-05, REQ-35-06) en la evidencia antes de implementarlo; los demás se reparten en cortes posteriores. Este primer corte no cierra el carril.
+- **Frontera entre repos:** F26 frontend; coordinar contrato versionado y prueba de integración cuando el resultado la requiera.
+- **Prueba mínima:** caso de éxito y caso negativo en runtime pertinente, con comando/artefacto y resultado en la evidencia del carril. Un mock solo prueba su capa.
+- **Gates de interfaz:** N/A backend puro; coordinar F26 frontend si cambia UX. **Animación:** N/A salvo contrato que afecte transición.
+- **Descubrimiento:** consultar CodeGraph para flujo e impacto y confirmar en archivos actuales.
+
+Los puntos del inventario siguiente describen capacidades previstas, **no** slices verticales listos para ejecutar. Corta cada capacidad restante por comportamiento y cierra su prueba antes de avanzar; sigue [la revisión general](../revision-vertical-slice-2026-10-16.md).
+
+---
+
+## Inventario histórico de capacidades
+
+Esta lista conserva el inventario original por componentes. No representa slices ejecutables ni el orden de entrega.
 
 1. Agregado y máquina de estados.
 2. Comando de solicitud con lock optimista sobre la capacidad del día.
@@ -91,5 +105,5 @@ Y en todos los casos:
 ## Cómo se activa
 
 ```
-/rsvp-master Ejecuta el carril 35 completo
+Usa $rsvp-backend-lane para ejecutar el carril 35 completo
 ```

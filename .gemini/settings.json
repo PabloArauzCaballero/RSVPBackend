@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "BeforeAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "rsvp-reload-skills",
+            "type": "command",
+            "command": "node \"${GEMINI_PROJECT_DIR}/scripts/reload-skills.mjs\" gemini",
+            "timeout": 10000,
+            "description": "Relee en cada prompt el catálogo completo de skills RSVP y marketing."
+          }
+        ]
+      }
+    ]
+  },
+  "mcpServers": {
+    "codegraph": {
+      "command": "node",
+      "args": [
+        "node_modules/@colbymchenry/codegraph/npm-shim.js",
+        "serve",
+        "--mcp"
+      ],
+      "env": {
+        "CODEGRAPH_TELEMETRY": "0",
+        "CODEGRAPH_NO_DOWNLOAD": "1"
+      }
+    }
+  }
+}

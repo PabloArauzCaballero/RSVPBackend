@@ -1,3 +1,5 @@
+> **Replanificación vigente (16-oct-2026):** [slices verticales y gates de CodeGraph, UX/UI y animación](../revision-vertical-slice-2026-10-16.md). Las fechas y tareas de esta ficha son objetivos históricos sujetos a reestimación con evidencia de slices completos.
+
 # Miguel · Eje C — Invitados y Avisos
 
 > Tenés el flujo que más usuarios finales toca: el invitado que abre un link y confirma. Y tenés la exigencia dura del cliente, que es **push real en iOS y Android**. Tu carril 24 y tu `F19` son los únicos que no se pueden demostrar con un test: necesitan un teléfono en la mano.

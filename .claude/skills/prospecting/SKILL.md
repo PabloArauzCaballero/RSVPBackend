@@ -1,0 +1,8 @@
+---
+name: prospecting
+description: When the user wants to find, qualify, and build a list of prospects to reach out to, across B2B SaaS, general B2B, or local small businesses. Also use when the user mentions "prospecting," "build a prospect list," "find leads," "lead list," "outbound list," "target account list," "ICP-fit accounts," "find local businesses," "find my first customers," "design partners," "signal-based outbound," "buying signals," "intent data," "job change alerts," "waterfall enrichment," "Clay table," "lookalike accounts," "catch-all emails," "account tiering," or "research this account before I reach out." Always verify emails before they reach a sequence, and never scrape LinkedIn. Define audiences in Sales Navigator and pull contacts from licensed data. Covers list building, signals, enrichment, verification, and account research. For the outreach itself (copy, sending setup, LinkedIn, cadences, replies), see cold-email. For researching competitors, see competitor-profiling.
+---
+
+# prospecting
+
+Lee íntegramente la fuente canónica `../../../.agents/skills/prospecting/SKILL.md` antes de aplicar esta skill. Si la fuente menciona referencias necesarias para la tarea, lee esos archivos desde su directorio canónico. La fuente canónica prevalece sobre este adaptador.

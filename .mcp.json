@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "node",
+      "args": [
+        "node_modules/@colbymchenry/codegraph/npm-shim.js",
+        "serve",
+        "--mcp"
+      ],
+      "env": {
+        "CODEGRAPH_TELEMETRY": "0",
+        "CODEGRAPH_NO_DOWNLOAD": "1"
+      }
+    }
+  }
+}
