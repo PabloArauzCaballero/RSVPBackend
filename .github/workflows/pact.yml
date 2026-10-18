@@ -8,9 +8,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with: {node-version-file: .nvmrc, cache: yarn}
-      - run: corepack enable && yarn install --immutable && yarn contracts:validate
+      - run: yarn install --immutable && yarn contracts:validate
       - name: Pact Broker gate
         run: |
           test -n "${PACT_BROKER_BASE_URL:-}" || { echo 'PACT_BROKER_BASE_URL must be configured in repository variables before Pact publication.'; exit 1; }

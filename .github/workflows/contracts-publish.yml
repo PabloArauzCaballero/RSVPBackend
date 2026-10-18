@@ -12,9 +12,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with: {node-version-file: .nvmrc, registry-url: https://npm.pkg.github.com}
-      - run: corepack enable && yarn install --immutable && yarn contracts:validate
+      - run: yarn install --immutable && yarn contracts:validate
       - run: yarn workspace @rsvp/contracts npm publish --access restricted
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
