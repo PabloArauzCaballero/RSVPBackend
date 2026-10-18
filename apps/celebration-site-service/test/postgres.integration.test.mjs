@@ -202,6 +202,17 @@ describe('Postgres + RabbitMQ integration', { skip: adminUrl ? false : 'set CELE
     await server.api('POST', `/celebrations/${c.id}/publish`, { token, ifMatch: 1 });
     assert.ok(await waitFor(async () => (await server.api('GET', `/celebrations/public/${c.slug}`)).status === 200, 30_000), 'publish reached the projection through the new connection');
   });
+  test('Postgres killing the service connections (idle or mid-transaction) does not crash it; the pool opens new ones', async () => {
+    const killed = await admin.query(
+      `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND application_name = 'celebration-site-service'`,
+      [database]
+    );
+    assert.ok(killed.rows.length > 0, 'there were connections to kill');
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    assert.equal((await server.api('GET', '/celebrations/ready')).body.status, 'ready');
+    const c = await createWedding(server.api, token);
+    assert.equal((await server.api('GET', `/celebrations/${c.id}`, { token })).status, 200);
+  });
 });
 
 export { CORE_SEEDS };

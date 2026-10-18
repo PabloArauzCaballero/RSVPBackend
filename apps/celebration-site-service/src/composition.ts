@@ -69,12 +69,12 @@ interface Storage {
   readonly ready: () => Promise<boolean>;
 }
 
-async function storage(config: RuntimeConfig): Promise<Storage> {
+async function storage(config: RuntimeConfig, logger: HttpLogger): Promise<Storage> {
   if (!config.databaseUrl) {
     const memory = new MemoryDatabase();
     return { uow: memory, publicTransactions: memory.publicTransactions, publicStore: { ...bindStore(memory) }, history: memory, memory, ready: async () => true };
   }
-  const pool = createPool(config.databaseUrl);
+  const pool = createPool(config.databaseUrl, undefined, (error) => logger.error('idle database connection lost', { error: error.message }));
   if (config.autoMigrate) await migrateUp(pool);
   return {
     uow: new PgUnitOfWork(pool), publicTransactions: new PgPublicTransactions(pool), publicStore: new PgPublicStore(pool), history: new PgEventHistory(pool), pool,
@@ -98,7 +98,7 @@ function bindStore(memory: MemoryDatabase): PublicCelebrationStore {
 
 export async function buildRuntime(config: RuntimeConfig = {}): Promise<Runtime> {
   const logger = config.logger ?? silent;
-  const store = await storage(config);
+  const store = await storage(config, logger);
   const app: ApplicationDeps = { uow: store.uow, clock: { now: config.clock ?? (() => new Date().toISOString()) }, ids: { next: () => randomUUID() } };
   await seedEventTypes(store.uow, config.seeds ?? (await readSeeds()));
   const projector = new PublicCelebrationProjector(store.publicTransactions);

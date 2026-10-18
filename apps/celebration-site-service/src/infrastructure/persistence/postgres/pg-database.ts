@@ -24,8 +24,16 @@ export type Client = pg.PoolClient;
 
 const DEFAULT_POOL_SIZE = 10;
 
-export function createPool(connectionString: string, max = DEFAULT_POOL_SIZE): Pool {
-  return new pg.Pool({ connectionString, max, types, application_name: 'celebration-site-service' });
+const ignoreIdleError = (): void => undefined;
+
+/**
+ * An idle client can be killed by the server (restart, failover, DROP DATABASE ... FORCE). pg emits that
+ * on the pool and drops the client; without a listener the error would crash the whole process.
+ */
+export function createPool(connectionString: string, max = DEFAULT_POOL_SIZE, onIdleError: (error: Error) => void = ignoreIdleError): Pool {
+  const pool = new pg.Pool({ connectionString, max, types, application_name: 'celebration-site-service' });
+  pool.on('error', onIdleError);
+  return pool;
 }
 
 /** Session settings read by the RLS helper functions of migration 0001. */
@@ -53,17 +61,41 @@ function translateError(error: unknown): unknown {
  * connection never carries a previous tenant); work; COMMIT — or ROLLBACK.
  */
 export async function inTransaction<TResult>(pool: Pool, settings: SessionSettings, work: (client: Client) => Promise<TResult>): Promise<TResult> {
+  return withTransaction(pool, async (client) => {
+    await Promise.all(Object.entries(settings).map(async ([key, value]) => client.query('SELECT set_config($1, $2, true)', [key, value])));
+    return work(client);
+  }, translateError);
+}
+
+/**
+ * BEGIN; work; COMMIT — or ROLLBACK. While the client is checked out the pool no longer listens to its
+ * errors, so a connection killed mid-transaction would crash the process; it is listened to here and the
+ * dead client is destroyed instead of going back to the pool. The original error is the one rethrown.
+ */
+export async function withTransaction<TResult>(pool: Pool, work: (client: Client) => Promise<TResult>, mapError: (error: unknown) => unknown = (error) => error): Promise<TResult> {
   const client = await pool.connect();
+  const state: { broken?: Error } = {};
+  const onError = (error: Error): void => { state.broken = error; };
+  client.on('error', onError);
   try {
     await client.query('BEGIN');
-    await Promise.all(Object.entries(settings).map(async ([key, value]) => client.query('SELECT set_config($1, $2, true)', [key, value])));
     const result = await work(client);
     await client.query('COMMIT');
     return result;
   } catch (error) {
-    await client.query('ROLLBACK');
-    throw translateError(error);
+    state.broken = state.broken ?? (await rollback(client));
+    throw mapError(error);
   } finally {
-    client.release();
+    client.off('error', onError);
+    client.release(state.broken);
+  }
+}
+
+async function rollback(client: Client): Promise<Error | undefined> {
+  try {
+    await client.query('ROLLBACK');
+    return undefined;
+  } catch (error) {
+    return error instanceof Error ? error : new Error(String(error));
   }
 }

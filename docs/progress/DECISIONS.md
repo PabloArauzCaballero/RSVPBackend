@@ -27,3 +27,7 @@
 - **Colas por despliegue:** `CELEBRATION_QUEUE_PREFIX` y `TEMPLATE_MEDIA_QUEUE_PREFIX`. Dos entornos sobre el mismo broker con la misma cola se roban mensajes (lo encontró la integración con los contenedores levantados); las pruebas usan colas exclusivas y efímeras.
 - **Las imágenes se construyen desde la raíz del repo** (`docker build -f apps/<svc>/Dockerfile .`) para usar los paquetes del workspace; `images.yml` sigue esa convención.
 
+- **URLs públicas estables para fotos** (`/media/public/assets/{id}/{variante}` → 302 a una URL firmada nueva): las URLs firmadas vencen y no pueden vivir en HTML cacheado ni en tarjetas de Open Graph.
+- **Conexiones que se caen no tumban el servicio.** El broker AMQP se reconecta solo y vuelve a declarar sus consumidores. En Postgres, el pool escucha los errores de conexiones inactivas y cada transacción escucha los de la conexión prestada; una conexión muerta se descarta en vez de volver al pool. Lo encontró el CI (`DROP DATABASE ... WITH (FORCE)` con el relay activo); la integración mata todas las conexiones del servicio y comprueba que sigue respondiendo.
+- **MinIO desde Chainguard** (`cgr.dev/chainguard/minio`, fijado por digest, `user: "0"` para escribir en un volumen nuevo): MinIO ya no publica imágenes gratuitas en Docker Hub ni en quay.io, y el digest anterior pedía autenticación.
+- **CI en `dev`**, igual que en RSVPFrontend; `corepack enable` va antes de `setup-node` (con `cache: yarn` corría Yarn 1 y fallaba todo).

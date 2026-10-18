@@ -1,7 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import type { Pool } from './pg-database.js';
+import { withTransaction, type Pool } from './pg-database.js';
 
 /**
  * Versioned, reversible migrations: `NNNN_name.up.sql` / `NNNN_name.down.sql`.
@@ -32,18 +32,10 @@ async function applied(pool: Pool): Promise<Set<string>> {
 }
 
 async function runFile(pool: Pool, sql: string, record: { readonly text: string; readonly values: readonly unknown[] }): Promise<void> {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
+  await withTransaction(pool, async (client) => {
     await client.query(sql);
     await client.query(record.text, [...record.values]);
-    await client.query('COMMIT');
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
-  }
+  });
 }
 
 /** Applies pending migrations in order; returns the names applied. */
