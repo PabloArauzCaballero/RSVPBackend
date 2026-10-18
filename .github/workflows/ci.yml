@@ -17,6 +17,9 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version-file: .nvmrc, cache: yarn}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.14'}
+      - run: pip install -r apps/template-media-service/requirements.txt
       - run: corepack enable
       - run: yarn install --immutable
       - run: yarn harness:validate
@@ -40,11 +43,31 @@ jobs:
       - uses: actions/setup-python@v5
         if: matrix.runtime == 'python'
         with: {python-version: '3.14'}
+      - run: pip install -r apps/template-media-service/requirements.txt
+        if: matrix.runtime == 'python'
       - run: corepack enable && yarn install --immutable
       - run: yarn workspace @rsvp/identity-service test
         if: matrix.runtime == 'java'
-      - run: yarn turbo run test --filter='@rsvp/*'
-        if: matrix.runtime != 'java'
+      - run: yarn turbo run test --filter='@rsvp/*' --filter='!@rsvp/template-media-service'
+        if: matrix.runtime == 'node'
+      - run: yarn turbo run test --filter='@rsvp/template-media-service'
+        if: matrix.runtime == 'python'
+
+  integration:
+    name: Integration (Postgres, RabbitMQ, MinIO)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version-file: .nvmrc, cache: yarn}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.14'}
+      - run: pip install -r apps/template-media-service/requirements.txt
+      - run: cp .env.example .env
+      - run: docker compose up -d --wait postgres rabbitmq minio && docker compose up minio-init
+      - run: corepack enable && yarn install --immutable
+      - run: yarn workspace @rsvp/celebration-site-service test:integration
+      - run: yarn workspace @rsvp/template-media-service test:integration
 
   secret-scan:
     name: Gitleaks

@@ -1,18 +1,36 @@
-from dataclasses import dataclass, field
-from enum import StrEnum
+import uuid
 
-class TemplateStatus(StrEnum):
-    DRAFT = "DRAFT"
-    PUBLISHED = "PUBLISHED"
-    ARCHIVED = "ARCHIVED"
+from django.db import models
+from django.utils import timezone
 
-@dataclass(slots=True)
-class Template:
-    id: str
-    name: str
-    event_type_tags: set[str]
-    sections: dict[str, object]
-    status: TemplateStatus = TemplateStatus.DRAFT
+from .domain import LAYOUTS
 
-    def compatible_with(self, event_type_tags: set[str]) -> bool:
-        return self.status is TemplateStatus.PUBLISHED and bool(self.event_type_tags & event_type_tags)
+
+class Template(models.Model):
+    """A row in the template catalogue. Adding a template is inserting one of these, not shipping a component."""
+
+    class Status(models.TextChoices):
+        DRAFT = "DRAFT"
+        PUBLISHED = "PUBLISHED"
+        ARCHIVED = "ARCHIVED"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    name = models.TextField()
+    description = models.TextField(blank=True, default="")
+    status = models.TextField(choices=Status.choices, default=Status.DRAFT)
+    event_type_tags = models.JSONField(default=list)
+    layout = models.TextField(choices=[(layout, layout) for layout in LAYOUTS])
+    theme = models.JSONField()
+    section_order = models.JSONField()
+    version = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
+    published_at = models.DateTimeField(null=True)
+
+    class Meta:
+        db_table = "template"
+        ordering = ["name", "id"]
+
+    def lifecycle_payload(self) -> dict:
+        """Payload of template.template.published.v1 / archived.v1 (TemplateLifecyclePayload)."""
+        return {"templateId": str(self.id), "name": self.name, "eventTypeTags": list(self.event_type_tags), "layout": self.layout, "status": self.status, "version": self.version}

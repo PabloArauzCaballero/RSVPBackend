@@ -1,0 +1,13 @@
+{
+  "code": "CORPORATE",
+  "status": "ACTIVE",
+  "defaultLocale": "es-BO",
+  "hostRoles": ["ORGANIZER"],
+  "enabledSections": ["schedule", "venues", "faq", "recommendations", "rsvp"],
+  "requiredFieldsForPublish": ["title", "eventDate", "venueName", "companyName", "hosts.ORGANIZER"],
+  "compatibleTemplateTags": ["corporate"],
+  "translations": [
+    { "locale": "es-BO", "name": "Evento corporativo", "hostRoleLabels": { "ORGANIZER": "Organizador" } },
+    { "locale": "en-US", "name": "Corporate event", "hostRoleLabels": { "ORGANIZER": "Organizer" } }
+  ]
+}

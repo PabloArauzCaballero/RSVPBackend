@@ -86,9 +86,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@rsvp/celebration-site-service@workspace:apps/celebration-site-service":
+"@rsvp/celebration-site-service@workspace:*, @rsvp/celebration-site-service@workspace:apps/celebration-site-service":
   version: 0.0.0-use.local
   resolution: "@rsvp/celebration-site-service@workspace:apps/celebration-site-service"
+  dependencies:
+    "@rsvp/gift-list-service": "workspace:*"
+    "@rsvp/guest-rsvp-service": "workspace:*"
+    "@rsvp/platform-auth": "workspace:*"
+    "@rsvp/platform-outbox": "workspace:*"
+    "@rsvp/platform-telemetry": "workspace:*"
+    "@types/amqplib": "npm:0.10.7"
+    "@types/node": "npm:24.7.2"
+    "@types/pg": "npm:8.15.5"
+    amqplib: "npm:0.10.9"
+    pg: "npm:8.16.3"
+    zod: "npm:4.1.12"
   languageName: unknown
   linkType: soft
 
@@ -134,13 +146,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@rsvp/gift-list-service@workspace:apps/gift-list-service":
+"@rsvp/gift-list-service@workspace:*, @rsvp/gift-list-service@workspace:apps/gift-list-service":
   version: 0.0.0-use.local
   resolution: "@rsvp/gift-list-service@workspace:apps/gift-list-service"
   languageName: unknown
   linkType: soft
 
-"@rsvp/guest-rsvp-service@workspace:apps/guest-rsvp-service":
+"@rsvp/guest-rsvp-service@workspace:*, @rsvp/guest-rsvp-service@workspace:apps/guest-rsvp-service":
   version: 0.0.0-use.local
   resolution: "@rsvp/guest-rsvp-service@workspace:apps/guest-rsvp-service"
   languageName: unknown
@@ -158,7 +170,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@rsvp/platform-auth@workspace:packages/platform-auth":
+"@rsvp/platform-auth@workspace:*, @rsvp/platform-auth@workspace:packages/platform-auth":
   version: 0.0.0-use.local
   resolution: "@rsvp/platform-auth@workspace:packages/platform-auth"
   languageName: unknown
@@ -170,13 +182,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@rsvp/platform-outbox@workspace:packages/platform-outbox":
+"@rsvp/platform-outbox@workspace:*, @rsvp/platform-outbox@workspace:packages/platform-outbox":
   version: 0.0.0-use.local
   resolution: "@rsvp/platform-outbox@workspace:packages/platform-outbox"
   languageName: unknown
   linkType: soft
 
-"@rsvp/platform-telemetry@workspace:packages/platform-telemetry":
+"@rsvp/platform-telemetry@workspace:*, @rsvp/platform-telemetry@workspace:packages/platform-telemetry":
   version: 0.0.0-use.local
   resolution: "@rsvp/platform-telemetry@workspace:packages/platform-telemetry"
   languageName: unknown
@@ -197,8 +209,197 @@ __metadata:
 "@rsvp/template-media-service@workspace:apps/template-media-service":
   version: 0.0.0-use.local
   resolution: "@rsvp/template-media-service@workspace:apps/template-media-service"
+  dependencies:
+    "@rsvp/celebration-site-service": "workspace:*"
   languageName: unknown
   linkType: soft
+
+"@types/amqplib@npm:0.10.7":
+  version: 0.10.7
+  resolution: "@types/amqplib@npm:0.10.7"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/058f466ef31df65e4d1b72f4d2ba41801e3b7227329cd1651f83eb98be3610aa2e116fbbccbbb65e062ad1358e59b32dfe9c69dd58cf3893bb8429d78e6653f5
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:*":
+  version: 26.6.5
+  resolution: "@types/node@npm:26.6.5"
+  dependencies:
+    undici-types: "npm:~8.9.0"
+  checksum: 10c0/4f791f69466ace7842c09e7bef96cb1ddbb65cf3db916ef7e84f0e2b2a17220b6b816dc7539d01520cadfb17ed7169b8214910900493e0a83be8bc7d124ec20a
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:24.7.2":
+  version: 24.7.2
+  resolution: "@types/node@npm:24.7.2"
+  dependencies:
+    undici-types: "npm:~7.14.0"
+  checksum: 10c0/03f662f10e4b89bc97016e067101cbabe55025b54c24afb581fb50992d5eeaaf417bdae34bbc668ae8759d3cdbbbadf35fc8b9b29d26f52ede2525d48e919e49
+  languageName: node
+  linkType: hard
+
+"@types/pg@npm:8.15.5":
+  version: 8.15.5
+  resolution: "@types/pg@npm:8.15.5"
+  dependencies:
+    "@types/node": "npm:*"
+    pg-protocol: "npm:*"
+    pg-types: "npm:^2.2.0"
+  checksum: 10c0/19a3cc1811918753f8c827733648c3a85c7b0355bf207c44eb1a3b79b2e6a0d85cb5457ec550d860fc9be7e88c7587a3600958ec8c61fa1ad573061c63af93f0
+  languageName: node
+  linkType: hard
+
+"amqplib@npm:0.10.9":
+  version: 0.10.9
+  resolution: "amqplib@npm:0.10.9"
+  dependencies:
+    buffer-more-ints: "npm:~1.0.0"
+    url-parse: "npm:~1.5.10"
+  checksum: 10c0/d241efba1e38cf158c36a0fe40fc1c5424f3abf1a2d2e7d4494cb308e1800bd42ddba02cc119b47a7f4f37ef1874dfa5a9dca294e5d84443727228244e62af62
+  languageName: node
+  linkType: hard
+
+"buffer-more-ints@npm:~1.0.0":
+  version: 1.0.0
+  resolution: "buffer-more-ints@npm:1.0.0"
+  checksum: 10c0/992b4e372e2550fd92296937ddfb8e67bb6af2664a63eb46492a1fbc05447755c5d8ba23a0311b2b1193ce23349eada76e8da4af49d75872fc40a5913557665b
+  languageName: node
+  linkType: hard
+
+"pg-cloudflare@npm:^1.2.7":
+  version: 1.4.1
+  resolution: "pg-cloudflare@npm:1.4.1"
+  checksum: 10c0/32e62c987073472e81c0dc218f850b1212b4e2c1f35d50433d87d054fe268f549ebaf8fc6c1227ab24c12b318f3e3a2a191ffbdfb2daa30b39aa6802ab8fe2f6
+  languageName: node
+  linkType: hard
+
+"pg-connection-string@npm:^2.9.1":
+  version: 2.14.1
+  resolution: "pg-connection-string@npm:2.14.1"
+  checksum: 10c0/7321eed97579b4972a714909e7a444beb2186780fe7fd86ea719ff7c8f1fad07d7e5f85722c4992245b23683ed7d2fe2bdda8f7469fed4c016bb5c3379c575ca
+  languageName: node
+  linkType: hard
+
+"pg-int8@npm:1.0.1":
+  version: 1.0.1
+  resolution: "pg-int8@npm:1.0.1"
+  checksum: 10c0/be6a02d851fc2a4ae3e9de81710d861de3ba35ac927268973eb3cb618873a05b9424656df464dd43bd7dc3fc5295c3f5b3c8349494f87c7af50ec59ef14e0b98
+  languageName: node
+  linkType: hard
+
+"pg-pool@npm:^3.10.1":
+  version: 3.14.0
+  resolution: "pg-pool@npm:3.14.0"
+  peerDependencies:
+    pg: ">=8.0"
+  checksum: 10c0/3dd706e67e3b317e29409d9eb3bd44e960eabd86db2a9711a9391bbd43881f8ce7a5f7054a341509558ee05e9bf0a3cc7aef037039da0790ce1e16762ade3ba6
+  languageName: node
+  linkType: hard
+
+"pg-protocol@npm:*, pg-protocol@npm:^1.10.3":
+  version: 1.16.1
+  resolution: "pg-protocol@npm:1.16.1"
+  checksum: 10c0/84e8bf05c3548c8ffcad29247c075f8f1cf477600c92a7eb0ab27c6c4cbdbe1280433582bfba91f629b1f68bcaf4ae26436a898f430e884d7887543931e8ade6
+  languageName: node
+  linkType: hard
+
+"pg-types@npm:2.2.0, pg-types@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "pg-types@npm:2.2.0"
+  dependencies:
+    pg-int8: "npm:1.0.1"
+    postgres-array: "npm:~2.0.0"
+    postgres-bytea: "npm:~1.0.0"
+    postgres-date: "npm:~1.0.4"
+    postgres-interval: "npm:^1.1.0"
+  checksum: 10c0/ab3f8069a323f601cd2d2279ca8c425447dab3f9b61d933b0601d7ffc00d6200df25e26a4290b2b0783b59278198f7dd2ed03e94c4875797919605116a577c65
+  languageName: node
+  linkType: hard
+
+"pg@npm:8.16.3":
+  version: 8.16.3
+  resolution: "pg@npm:8.16.3"
+  dependencies:
+    pg-cloudflare: "npm:^1.2.7"
+    pg-connection-string: "npm:^2.9.1"
+    pg-pool: "npm:^3.10.1"
+    pg-protocol: "npm:^1.10.3"
+    pg-types: "npm:2.2.0"
+    pgpass: "npm:1.0.5"
+  peerDependencies:
+    pg-native: ">=3.0.1"
+  dependenciesMeta:
+    pg-cloudflare:
+      optional: true
+  peerDependenciesMeta:
+    pg-native:
+      optional: true
+  checksum: 10c0/a6a407ff0efb7599760d72ffdcda47a74c34c0fd71d896623caac45cf2cfb0f49a10973cce23110f182b9810639a1e9f6904454d7358c7001574ee0ffdcbce2a
+  languageName: node
+  linkType: hard
+
+"pgpass@npm:1.0.5":
+  version: 1.0.5
+  resolution: "pgpass@npm:1.0.5"
+  dependencies:
+    split2: "npm:^4.1.0"
+  checksum: 10c0/5ea6c9b2de04c33abb08d33a2dded303c4a3c7162a9264519cbe85c0a9857d712463140ba42fad0c7cd4b21f644dd870b45bb2e02fcbe505b4de0744fd802c1d
+  languageName: node
+  linkType: hard
+
+"postgres-array@npm:~2.0.0":
+  version: 2.0.0
+  resolution: "postgres-array@npm:2.0.0"
+  checksum: 10c0/cbd56207e4141d7fbf08c86f2aebf21fa7064943d3f808ec85f442ff94b48d891e7a144cc02665fb2de5dbcb9b8e3183a2ac749959e794b4a4cfd379d7a21d08
+  languageName: node
+  linkType: hard
+
+"postgres-bytea@npm:~1.0.0":
+  version: 1.0.1
+  resolution: "postgres-bytea@npm:1.0.1"
+  checksum: 10c0/10b28a27c9d703d5befd97c443e62b551096d1014bc59ab574c65bf0688de7f3f068003b2aea8dcff83cf0f6f9a35f9f74457c38856cf8eb81b00cf3fb44f164
+  languageName: node
+  linkType: hard
+
+"postgres-date@npm:~1.0.4":
+  version: 1.0.7
+  resolution: "postgres-date@npm:1.0.7"
+  checksum: 10c0/0ff91fccc64003e10b767fcfeefb5eaffbc522c93aa65d5051c49b3c4ce6cb93ab091a7d22877a90ad60b8874202c6f1d0f935f38a7235ed3b258efd54b97ca9
+  languageName: node
+  linkType: hard
+
+"postgres-interval@npm:^1.1.0":
+  version: 1.2.0
+  resolution: "postgres-interval@npm:1.2.0"
+  dependencies:
+    xtend: "npm:^4.0.0"
+  checksum: 10c0/c1734c3cb79e7f22579af0b268a463b1fa1d084e742a02a7a290c4f041e349456f3bee3b4ee0bb3f226828597f7b76deb615c1b857db9a742c45520100456272
+  languageName: node
+  linkType: hard
+
+"querystringify@npm:^2.1.1":
+  version: 2.2.0
+  resolution: "querystringify@npm:2.2.0"
+  checksum: 10c0/3258bc3dbdf322ff2663619afe5947c7926a6ef5fb78ad7d384602974c467fadfc8272af44f5eb8cddd0d011aae8fabf3a929a8eee4b86edcc0a21e6bd10f9aa
+  languageName: node
+  linkType: hard
+
+"requires-port@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "requires-port@npm:1.0.0"
+  checksum: 10c0/b2bfdd09db16c082c4326e573a82c0771daaf7b53b9ce8ad60ea46aa6e30aaf475fe9b164800b89f93b748d2c234d8abff945d2551ba47bf5698e04cd7713267
+  languageName: node
+  linkType: hard
+
+"split2@npm:^4.1.0":
+  version: 4.2.0
+  resolution: "split2@npm:4.2.0"
+  checksum: 10c0/b292beb8ce9215f8c642bb68be6249c5a4c7f332fc8ecadae7be5cbdf1ea95addc95f0459ef2e7ad9d45fd1064698a097e4eb211c83e772b49bc0ee423e91534
+  languageName: node
+  linkType: hard
 
 "turbo-darwin-64@npm:2.5.6":
   version: 2.5.6
@@ -288,5 +489,43 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/34d2a8e23eb8e0d1875072064d5e1d9c102e0bdce56a10a25c0b917b8aa9001a9cf5c225df12497e99da107dc379360bc138163c66b55b95f5b105b50578067e
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~7.14.0":
+  version: 7.14.0
+  resolution: "undici-types@npm:7.14.0"
+  checksum: 10c0/e7f3214b45d788f03c51ceb33817be99c65dae203863aa9386b3ccc47201a245a7955fc721fb581da9c888b6ebad59fa3f53405214afec04c455a479908f0f14
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~8.9.0":
+  version: 8.9.0
+  resolution: "undici-types@npm:8.9.0"
+  checksum: 10c0/51c712c20c087368f62c6fc0f2bc49fa76bfe5dec28ff01584bb677ff29b0622569783c02d43e151143808c48c0503f804093bd2c491b10f2a830138034cb451
+  languageName: node
+  linkType: hard
+
+"url-parse@npm:~1.5.10":
+  version: 1.5.10
+  resolution: "url-parse@npm:1.5.10"
+  dependencies:
+    querystringify: "npm:^2.1.1"
+    requires-port: "npm:^1.0.0"
+  checksum: 10c0/bd5aa9389f896974beb851c112f63b466505a04b4807cea2e5a3b7092f6fbb75316f0491ea84e44f66fed55f1b440df5195d7e3a8203f64fcefa19d182f5be87
+  languageName: node
+  linkType: hard
+
+"xtend@npm:^4.0.0":
+  version: 4.0.2
+  resolution: "xtend@npm:4.0.2"
+  checksum: 10c0/366ae4783eec6100f8a02dff02ac907bf29f9a00b82ac0264b4d8b832ead18306797e283cf19de776538babfdcb2101375ec5646b59f08c52128ac4ab812ed0e
+  languageName: node
+  linkType: hard
+
+"zod@npm:4.1.12":
+  version: 4.1.12
+  resolution: "zod@npm:4.1.12"
+  checksum: 10c0/b64c1feb19e99d77075261eaf613e0b2be4dfcd3551eff65ad8b4f2a079b61e379854d066f7d447491fcf193f45babd8095551a9d47973d30b46b6d8e2c46774
   languageName: node
   linkType: hard

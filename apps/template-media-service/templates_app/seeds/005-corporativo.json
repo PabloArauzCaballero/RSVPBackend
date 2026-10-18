@@ -1,0 +1,4 @@
+{ "key": "corporativo", "name": "Corporativo", "description": "Sobrio y claro, centrado en agenda, lugar y registro.", "layout": "corporate",
+  "eventTypeTags": ["corporate"],
+  "theme": { "palette": { "canvas": "#F5F7FA", "surface": "#FFFFFF", "text": "#14202B", "accent": "#1F5FAD", "muted": "#53606C" }, "typography": { "heading": "'IBM Plex Sans', Arial, sans-serif", "body": "'IBM Plex Sans', Arial, sans-serif" }, "sectionStyle": "plain" },
+  "sectionOrder": ["schedule", "venues", "faq", "recommendations", "rsvp"] }

@@ -82,8 +82,9 @@ plugins:
     config:
       origins: ["http://localhost:3000", "http://localhost:8081"]
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-      headers: ["Authorization", "Content-Type", "X-Correlation-Id"]
-      exposed_headers: ["X-Correlation-Id"]
+      # If-Match carries the edited version on every write (optimistic locking); Accept-Language picks the content locale.
+      headers: ["Authorization", "Content-Type", "X-Correlation-Id", "If-Match", "Accept-Language"]
+      exposed_headers: ["X-Correlation-Id", "ETag", "Location", "Content-Language"]
       credentials: true
   - name: request-size-limiting
     config:

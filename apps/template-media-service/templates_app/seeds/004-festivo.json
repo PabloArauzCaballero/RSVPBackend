@@ -1,0 +1,4 @@
+{ "key": "festivo", "name": "Festivo", "description": "Colores vivos y tarjetas redondeadas para celebrar en grande.", "layout": "festive",
+  "eventTypeTags": ["quinceanera", "birthday", "baptism"],
+  "theme": { "palette": { "canvas": "#FFF5FA", "surface": "#FFFFFF", "text": "#2B1730", "accent": "#C2185B", "muted": "#6E5672" }, "typography": { "heading": "'Fredoka', 'Trebuchet MS', sans-serif", "body": "'Nunito', Arial, sans-serif" }, "sectionStyle": "cards" },
+  "sectionOrder": ["story", "schedule", "venues", "dressCode", "gallery", "gifts", "faq", "rsvp"] }

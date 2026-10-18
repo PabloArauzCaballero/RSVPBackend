@@ -4,9 +4,15 @@
   "private": true,
   "rsvpRuntime": "python-django",
   "scripts": {
-    "build": "python -m compileall -q templates_app media_app outbox",
-    "lint": "python -m compileall -q templates_app media_app outbox",
-    "test": "python -m unittest discover -s tests -p \"test_*.py\"",
+    "setup": "python -m venv .venv && node scripts/py.mjs -m pip install -r requirements.txt",
+    "build": "node scripts/py.mjs -m compileall -q rsvp_template_media templates_app media_app outbox",
+    "lint": "node scripts/py.mjs manage.py check && node scripts/py.mjs manage.py makemigrations --check --dry-run",
+    "test": "node scripts/py.mjs manage.py test tests",
+    "test:integration": "node scripts/py.mjs scripts/integration.py",
+    "start": "node scripts/py.mjs manage.py migrate --noinput && node scripts/py.mjs manage.py seed_templates && node scripts/py.mjs manage.py runserver 0.0.0.0:8002",
     "health": "node ../../scripts/workspace-check.mjs test"
+  },
+  "devDependencies": {
+    "@rsvp/celebration-site-service": "workspace:*"
   }
 }

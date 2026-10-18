@@ -1,0 +1,13 @@
+{
+  "code": "QUINCEANERA",
+  "status": "ACTIVE",
+  "defaultLocale": "es-BO",
+  "hostRoles": ["CELEBRANT"],
+  "enabledSections": ["story", "schedule", "venues", "gallery", "dressCode", "faq", "gifts", "rsvp"],
+  "requiredFieldsForPublish": ["title", "eventDate", "venueName", "hosts.CELEBRANT"],
+  "compatibleTemplateTags": ["quinceanera"],
+  "translations": [
+    { "locale": "es-BO", "name": "Quinceaños", "description": "Celebración de los quince años.", "hostRoleLabels": { "CELEBRANT": "Quinceañera" } },
+    { "locale": "en-US", "name": "Quinceañera", "description": "Fifteenth birthday celebration.", "hostRoleLabels": { "CELEBRANT": "Birthday girl" } }
+  ]
+}

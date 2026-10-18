@@ -1,0 +1,47 @@
+{
+  "$comment": "Contract of celebration.settings.updated.v1 (lane 12). Published by celebration-site-service through its outbox to exchange celebration.events with this routing key. Consumers: guest-rsvp-service (unregisteredRsvpMode, extraCompanionMode, rsvpDeadline) and gift-list-service (giftReservationMode, externalGiftMode, partnerPriorityEnabled).",
+  "channel": "celebration.settings.updated.v1",
+  "exchange": "celebration.events",
+  "envelope": {
+    "$ref": "../asyncapi.yaml#/components/schemas/EventEnvelope"
+  },
+  "payload": {
+    "$ref": "../asyncapi.yaml#/components/schemas/CelebrationSettingsUpdatedPayload"
+  },
+  "rules": [
+    "Deduplicate by envelope.eventId (inbox).",
+    "Apply only if payload.settingsVersion is greater than the last applied for that celebrationId.",
+    "Non-retroactive: requests created before payload.effectiveFrom keep their current state; never re-evaluate or drain pending requests when a mode switches to AUTO_ACCEPT.",
+    "A celebration with no settings event yet is RESTRICTED in all four modes."
+  ],
+  "example": {
+    "eventType": "celebration.settings.updated.v1",
+    "eventVersion": 1,
+    "producer": "celebration-site-service",
+    "tenant": {
+      "celebrationId": "11111111-1111-4111-8111-111111111111",
+      "organizationId": null
+    },
+    "actor": {
+      "type": "USER",
+      "id": "22222222-2222-4222-8222-222222222222"
+    },
+    "payload": {
+      "celebrationId": "11111111-1111-4111-8111-111111111111",
+      "giftReservationMode": "AUTO_ACCEPT",
+      "unregisteredRsvpMode": "RESTRICTED",
+      "extraCompanionMode": "RESTRICTED",
+      "externalGiftMode": "RESTRICTED",
+      "rsvpDeadline": "2026-12-11T03:59:00.000Z",
+      "partnerPriorityEnabled": false,
+      "settingsVersion": 2,
+      "effectiveFrom": "2026-10-17T13:00:00.000Z",
+      "timeZone": "America/La_Paz",
+      "defaultLocale": "es-BO",
+      "changedFields": [
+        "giftReservationMode"
+      ],
+      "aggregateVersion": 2
+    }
+  }
+}

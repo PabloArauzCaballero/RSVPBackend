@@ -29,8 +29,9 @@ services:
       - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 5s
-      timeout: 5s
+      interval: 10s
+      # The diagnostics CLI boots an Erlang VM; on a busy laptop that alone can take 8 s.
+      timeout: 15s
       retries: 20
 
   redis:
@@ -84,6 +85,8 @@ services:
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
       KONG_PROXY_LISTEN: 0.0.0.0:8000
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      # Redeployed services get new container IPs; a short DNS TTL lets Kong follow them within seconds.
+      KONG_DNS_VALID_TTL: "10"
     ports: ["8000:8000", "8001:8001"]
     volumes:
       - ./kong/kong.yml:/usr/local/kong/declarative/kong.yml:ro
@@ -137,6 +140,62 @@ services:
       - grafana_data:/var/lib/grafana
     ports: ["3000:3000"]
     depends_on: [prometheus, tempo, loki]
+
+  # --- Eje B (Leo): run with `docker compose --profile apps up -d --build` ------------------
+  celebration-site-service:
+    profiles: ["apps"]
+    build: {context: .., dockerfile: apps/celebration-site-service/Dockerfile}
+    environment:
+      PORT: "3001"
+      CELEBRATION_DATABASE_URL: postgresql://celebration_owner:${CELEBRATION_OWNER_PASSWORD:-local-celebration-password}@postgres:5432/celebration_db
+      CELEBRATION_AUTO_MIGRATE: "true"
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-local-rabbitmq}:${RABBITMQ_DEFAULT_PASS:-local-rabbitmq-password}@rabbitmq:5672
+      IDENTITY_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      IDENTITY_JWKS_JSON: ${IDENTITY_JWKS_JSON:-}
+    depends_on:
+      postgres: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+    ports: ["3001:3001"]
+
+  template-media-service:
+    profiles: ["apps"]
+    build: {context: .., dockerfile: apps/template-media-service/Dockerfile}
+    environment: &template-media-env
+      TEMPLATE_DATABASE_URL: postgresql://template_owner:${TEMPLATE_OWNER_PASSWORD:-local-template-password}@postgres:5432/template_db
+      RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-local-rabbitmq}:${RABBITMQ_DEFAULT_PASS:-local-rabbitmq-password}@rabbitmq:5672
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}
+      PUBLIC_MEDIA_BASE_URL: ${PUBLIC_MEDIA_BASE_URL:-http://localhost:8000/media}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-local-minio}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-local-minio-password}
+      IDENTITY_JWKS_URL: http://identity-service:8080/.well-known/jwks.json
+      IDENTITY_JWKS_JSON: ${IDENTITY_JWKS_JSON:-}
+      DJANGO_SECRET_KEY: ${TEMPLATE_DJANGO_SECRET_KEY:-local-only-template-media-secret}
+    depends_on:
+      postgres: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+      minio-init: {condition: service_completed_successfully}
+    ports: ["8002:8002"]
+
+  template-media-relay:
+    profiles: ["apps"]
+    build: {context: .., dockerfile: apps/template-media-service/Dockerfile}
+    environment: *template-media-env
+    command: ["python", "manage.py", "relay_outbox"]
+    healthcheck: {disable: true}  # a worker, not an HTTP server
+    depends_on:
+      template-media-service: {condition: service_healthy}
+    restart: unless-stopped
+
+  template-media-consumer:
+    profiles: ["apps"]
+    build: {context: .., dockerfile: apps/template-media-service/Dockerfile}
+    environment: *template-media-env
+    command: ["python", "manage.py", "consume_events"]
+    healthcheck: {disable: true}  # a worker, not an HTTP server
+    depends_on:
+      template-media-service: {condition: service_healthy}
+    restart: unless-stopped
 
 volumes:
   postgres_data:

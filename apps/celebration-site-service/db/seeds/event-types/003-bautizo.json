@@ -1,0 +1,13 @@
+{
+  "code": "BAUTIZO",
+  "status": "ACTIVE",
+  "defaultLocale": "es-BO",
+  "hostRoles": ["PARENT", "GODPARENT"],
+  "enabledSections": ["story", "schedule", "venues", "gallery", "faq", "rsvp"],
+  "requiredFieldsForPublish": ["title", "eventDate", "venueName", "childName", "hosts.PARENT"],
+  "compatibleTemplateTags": ["baptism"],
+  "translations": [
+    { "locale": "es-BO", "name": "Bautizo", "description": "Ceremonia de bautizo y celebración familiar.", "hostRoleLabels": { "PARENT": "Madre o padre", "GODPARENT": "Padrino o madrina" } },
+    { "locale": "en-US", "name": "Baptism", "description": "Baptism ceremony and family celebration.", "hostRoleLabels": { "PARENT": "Parent", "GODPARENT": "Godparent" } }
+  ]
+}

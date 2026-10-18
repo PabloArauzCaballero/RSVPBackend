@@ -1,0 +1,13 @@
+{
+  "code": "WEDDING",
+  "status": "ACTIVE",
+  "defaultLocale": "es-BO",
+  "hostRoles": ["BRIDE", "GROOM"],
+  "enabledSections": ["story", "schedule", "venues", "gallery", "dressCode", "faq", "recommendations", "gifts", "rsvp"],
+  "requiredFieldsForPublish": ["title", "eventDate", "venueName", "hosts.BRIDE", "hosts.GROOM"],
+  "compatibleTemplateTags": ["wedding"],
+  "translations": [
+    { "locale": "es-BO", "name": "Boda", "description": "Ceremonia y celebración de matrimonio.", "hostRoleLabels": { "BRIDE": "Novia", "GROOM": "Novio" } },
+    { "locale": "en-US", "name": "Wedding", "description": "Wedding ceremony and celebration.", "hostRoleLabels": { "BRIDE": "Bride", "GROOM": "Groom" } }
+  ]
+}

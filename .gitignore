@@ -17,3 +17,6 @@ __pycache__/
 apps/identity-service/.gradle
 apps/identity-service/build
 apps/identity-service/bin
+
+# Local SQLite databases
+*.sqlite3

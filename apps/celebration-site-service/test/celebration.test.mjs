@@ -1,13 +1,40 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Celebration, DomainError, InMemoryCelebrationRepository, CelebrationService, Money, PublicCelebrationProjection, ValidationError, eventTypeSeeds, resolveLocale, translateEventType } from '../dist/index.js';
+import { randomUUID } from 'node:crypto';
+import { celebrationApplication, buildRuntime, recordTemplateReference } from '../dist/index.js';
+import { ALL_SEEDS, weddingContent } from './support.mjs';
 
-const now = '2026-10-11T12:00:00.000Z';
-const input = (id = '11111111-1111-1111-1111-111111111111') => ({ id, slug: `event-${id.slice(0, 4)}`, ownerId: '22222222-2222-2222-2222-222222222222', eventTypeCode: 'WEDDING', content: { title: 'Ana y Luis' } });
-test('domain guards published slug and terminal archive transitions', () => { const celebration = new Celebration(input()); assert.throws(() => celebration.publish(eventTypeSeeds[0], 'owner', now), ValidationError); celebration.content = { title: 'Ana y Luis', eventDate: '2026-11-01T19:00:00Z', venueName: 'Salón' }; celebration.publish(eventTypeSeeds[0], 'owner', now); assert.equal(celebration.status, 'PUBLISHED'); assert.throws(() => celebration.edit({ slug: 'other' }), DomainError); celebration.unpublish('owner', now); celebration.archive('owner', now); assert.throws(() => celebration.publish(eventTypeSeeds[0], 'owner', now), DomainError); });
-test('type definitions are data driven with locale fallback and baptism extension', () => { assert.deepEqual(eventTypeSeeds[0].hostRoles, ['BRIDE', 'GROOM']); assert.equal(translateEventType(eventTypeSeeds[0], 'en-US').name, 'Wedding'); assert.equal(translateEventType(eventTypeSeeds[0], 'fr-FR').name, 'Boda'); const baptism = eventTypeSeeds.find((type) => type.code === 'BAUTIZO'); assert.equal(baptism.requiredFieldsForPublish.includes('childName'), true); });
-test('settings default restricted, authorization and outbox event work', () => { const repo = new InMemoryCelebrationRepository(); const service = new CelebrationService(repo, new Map(eventTypeSeeds.map((type) => [type.code, type]))); const value = service.create(input(), 'owner', '33333333-3333-3333-3333-333333333333', now); assert.equal(value.settings.externalGiftMode, 'RESTRICTED'); assert.throws(() => service.updateSettings(value.id, value.id, 'attacker', 'GUEST', false, { externalGiftMode: 'AUTO_ACCEPT' }, '33333333-3333-3333-3333-333333333333', now, value.version), (error) => error.code === 403); const updated = service.updateSettings(value.id, value.id, 'owner', 'HOST', false, { externalGiftMode: 'AUTO_ACCEPT', rsvpDeadline: '2026-10-31T00:00:00Z' }, '33333333-3333-3333-3333-333333333333', now, value.version); assert.equal(updated.settings.externalGiftMode, 'AUTO_ACCEPT'); assert.equal(repo.events.at(-1).eventType, 'celebration.settings.updated.v1'); });
-test('tenant isolation and optimistic lock do not leak other celebrations', () => { const repo = new InMemoryCelebrationRepository(); const service = new CelebrationService(repo, new Map(eventTypeSeeds.map((type) => [type.code, type]))); const item = service.create(input(), 'owner', '33333333-3333-3333-3333-333333333333', now); assert.throws(() => service.get(item.id, 'not-this-tenant'), (error) => error.code === 404); const stale = item.version - 1; assert.throws(() => service.updateSettings(item.id, item.id, 'owner', 'HOST', false, {}, '33333333-3333-3333-3333-333333333333', now, stale), (error) => error.code === 409); });
-test('public projection is idempotent and replayable', () => { const repo = new InMemoryCelebrationRepository(); const service = new CelebrationService(repo, new Map(eventTypeSeeds.map((type) => [type.code, type]))); const item = service.create({ ...input(), content: { title: 'Original', eventDate: '2026-12-01T23:30:00Z', venueName: 'A' }, translations: { 'en-US': { title: 'Original in English' } } }, 'owner', '33333333-3333-3333-3333-333333333333', now); service.publish(item.id, item.id, 'owner', '33333333-3333-3333-3333-333333333333', now, item.version); const projection = new PublicCelebrationProjection(); const published = repo.events.at(-1); projection.apply(item, published, 'en-US'); projection.apply(item, published, 'en-US'); const first = projection.get(item.slug); projection.replay(repo.events, repo.all(), 'en-US'); assert.deepEqual(projection.get(item.slug), first); });
-test('unpublished celebrations are removed from the public projection', () => { const repo = new InMemoryCelebrationRepository(); const service = new CelebrationService(repo, new Map(eventTypeSeeds.map((type) => [type.code, type]))); const item = service.create({ ...input(), content: { title: 'Visible', eventDate: '2026-12-01T23:30:00Z', venueName: 'A' } }, 'owner', '33333333-3333-3333-3333-333333333333', now); service.publish(item.id, item.id, 'owner', '33333333-3333-3333-3333-333333333333', now, item.version); const projection = new PublicCelebrationProjection(); projection.apply(item, repo.events.at(-1), 'es-BO'); assert.ok(projection.get(item.slug)); service.unpublish(item.id, item.id, 'owner', '33333333-3333-3333-3333-333333333333', now, item.version); projection.apply(item, repo.events.at(-1), 'es-BO'); assert.equal(projection.get(item.slug), undefined); });
-test('money uses integer minor units and locales resolve safely', () => { assert.equal(new Money(150, 'BOB').add(new Money(50, 'BOB')).minorUnits, 200); assert.throws(() => new Money(1.5, 'BOB')); assert.equal(resolveLocale('fr-FR,es;q=0.5', ['es-BO', 'en-US'], 'es-BO'), 'es-BO'); });
+/** The use-case facade, without HTTP: what a script or another adapter would call. */
+test('the application facade drives a celebration through its whole life', async () => {
+  const runtime = await buildRuntime({ seeds: ALL_SEEDS, authenticator: { authenticate: async () => { throw new Error('unused'); } } });
+  const app = celebrationApplication(runtime.app);
+  const owner = { actor: { userId: randomUUID(), roles: [], organizationIds: [] }, correlationId: randomUUID() };
+  const coHost = randomUUID();
+  const template = randomUUID();
+  await recordTemplateReference(runtime.app, { templateId: template, tags: ['wedding'], status: 'PUBLISHED' });
+
+  const created = await app.create(owner, { slug: 'fachada-boda', eventTypeCode: 'WEDDING', content: weddingContent });
+  let state = await app.edit(owner, { celebrationId: created.id, expectedVersion: created.version, patch: { content: { story: 'Historia' } } });
+  state = await app.setCollaborator(owner, { celebrationId: state.id, expectedVersion: state.version, userId: coHost, role: 'CO_HOST' });
+  state = await app.updateSettings(owner, { celebrationId: state.id, expectedVersion: state.version, patch: { giftReservationMode: 'AUTO_ACCEPT' } });
+  state = await app.selectTemplate(owner, { celebrationId: state.id, expectedVersion: state.version, templateId: template });
+  assert.deepEqual(await app.publishCheck(owner, state.id), { ready: true, missingFields: [], status: 'DRAFT', version: state.version });
+  state = await app.publish(owner, { celebrationId: state.id, expectedVersion: state.version });
+  state = await app.unpublish(owner, { celebrationId: state.id, expectedVersion: state.version, reason: null });
+  state = await app.assignType(owner, { celebrationId: state.id, expectedVersion: state.version, eventTypeCode: 'ANNIVERSARY' });
+  state = await app.archive(owner, { celebrationId: state.id, expectedVersion: state.version });
+  assert.equal(state.status, 'ARCHIVED');
+
+  const view = await app.get(owner, state.id);
+  assert.equal(view.access, 'MANAGE');
+  assert.equal((await app.list(owner, { limit: 10, offset: 0 })).length, 1);
+  assert.deepEqual((await app.audit(owner, state.id)).map((entry) => entry.action),
+    ['CREATED', 'CONFIGURED', 'CONFIGURED', 'SETTINGS_UPDATED', 'TEMPLATE_SELECTED', 'PUBLISHED', 'UNPUBLISHED', 'TYPE_ASSIGNED', 'ARCHIVED']);
+  assert.equal((await app.eventTypes('en-US')).find((type) => type.code === 'BAUTIZO').name, 'Baptism');
+  assert.equal((await app.eventType('CORPORATE')).name, 'Evento corporativo');
+
+  const admin = { actor: { userId: randomUUID(), roles: ['ADMIN'], organizationIds: [] }, correlationId: randomUUID() };
+  const definition = { ...ALL_SEEDS[0], code: 'WEDDING_CIVIL' };
+  assert.equal((await app.upsertEventType(admin, definition)).created, true);
+  await runtime.close();
+});

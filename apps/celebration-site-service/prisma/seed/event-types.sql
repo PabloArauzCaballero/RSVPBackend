@@ -1,5 +1,0 @@
-INSERT INTO event_type_definition (code, default_locale, host_roles, enabled_sections, required_fields_for_publish, compatible_template_tags, translations) VALUES
-('WEDDING','es-BO','["BRIDE","GROOM"]','["story","schedule","gifts"]','["title","eventDate","venueName"]','["wedding"]','[{"locale":"es-BO","name":"Boda"},{"locale":"en-US","name":"Wedding"}]'),
-('QUINCEANERA','es-BO','["CELEBRANT"]','["story","schedule","gifts"]','["title","eventDate","celebrantName"]','["quinceanera"]','[{"locale":"es-BO","name":"Quinceaños"},{"locale":"en-US","name":"Fifteenth birthday"}]'),
-('BAUTIZO','es-BO','["PARENT"]','["story","schedule"]','["title","eventDate","childName"]','["baptism"]','[{"locale":"es-BO","name":"Bautizo"},{"locale":"en-US","name":"Baptism"}]')
-ON CONFLICT (code) DO UPDATE SET default_locale=EXCLUDED.default_locale, host_roles=EXCLUDED.host_roles, enabled_sections=EXCLUDED.enabled_sections, required_fields_for_publish=EXCLUDED.required_fields_for_publish, compatible_template_tags=EXCLUDED.compatible_template_tags, translations=EXCLUDED.translations;

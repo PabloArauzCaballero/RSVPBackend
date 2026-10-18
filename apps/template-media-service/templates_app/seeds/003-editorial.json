@@ -1,0 +1,4 @@
+{ "key": "editorial", "name": "Editorial", "description": "Composición de revista con titulares grandes y fotografía protagonista.", "layout": "editorial",
+  "eventTypeTags": ["wedding", "quinceanera"],
+  "theme": { "palette": { "canvas": "#F4EFE9", "surface": "#FFFFFF", "text": "#211D1A", "accent": "#A33B2A", "muted": "#6B605A" }, "typography": { "heading": "'Playfair Display', Georgia, serif", "body": "'Lora', Georgia, serif" }, "sectionStyle": "cards" },
+  "sectionOrder": ["gallery", "story", "schedule", "venues", "dressCode", "faq", "gifts", "recommendations", "rsvp"] }

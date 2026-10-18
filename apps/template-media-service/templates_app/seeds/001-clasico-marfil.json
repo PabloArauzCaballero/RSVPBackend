@@ -1,0 +1,4 @@
+{ "key": "clasico-marfil", "name": "Clásico marfil", "description": "Serif elegante sobre fondo marfil, para ceremonias tradicionales.", "layout": "classic",
+  "eventTypeTags": ["wedding", "anniversary"],
+  "theme": { "palette": { "canvas": "#FFFBF4", "surface": "#FFFFFF", "text": "#302C28", "accent": "#865E36", "muted": "#6F665D" }, "typography": { "heading": "'Cormorant Garamond', Georgia, serif", "body": "'Source Sans 3', Arial, sans-serif" }, "sectionStyle": "bands" },
+  "sectionOrder": ["story", "schedule", "venues", "gallery", "dressCode", "gifts", "faq", "recommendations", "rsvp"] }

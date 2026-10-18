@@ -1,0 +1,13 @@
+{
+  "code": "ANNIVERSARY",
+  "status": "ACTIVE",
+  "defaultLocale": "es-BO",
+  "hostRoles": ["SPOUSE"],
+  "enabledSections": ["story", "schedule", "venues", "gallery", "faq", "gifts", "rsvp"],
+  "requiredFieldsForPublish": ["title", "eventDate", "venueName", "hosts.SPOUSE"],
+  "compatibleTemplateTags": ["anniversary", "wedding"],
+  "translations": [
+    { "locale": "es-BO", "name": "Aniversario", "hostRoleLabels": { "SPOUSE": "Pareja" } },
+    { "locale": "en-US", "name": "Anniversary", "hostRoleLabels": { "SPOUSE": "Couple" } }
+  ]
+}

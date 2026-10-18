@@ -1,5 +1,0 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql" url = env("DATABASE_URL") }
-model Celebration { id String @id @db.Uuid; slug String @unique; organizationId String? @db.Uuid; ownerId String @db.Uuid; eventTypeCode String; status String; version Int; defaultLocale String; timeZone String; currency String; content Json; translations Json; settings Json; createdAt DateTime @default(now()) @db.Timestamptz(6); updatedAt DateTime @updatedAt @db.Timestamptz(6) }
-model EventTypeDefinition { code String @id; defaultLocale String; hostRoles Json; enabledSections Json; requiredFieldsForPublish Json; compatibleTemplateTags Json; translations Json }
-model PublicCelebration { slug String @id; payload Json; projectionVersion Int; updatedAt DateTime @updatedAt @db.Timestamptz(6) }

@@ -1,6 +1,1046 @@
 {
-  "openapi": "3.1.0", "info": {"title": "RSVP Template and Media API", "version": "1.0.0"}, "servers": [{"url": "http://localhost:8000/media"}],
-  "paths": {"/health": {"get": {"responses": {"200": {"description": "Healthy"}}}}, "/templates": {"get": {"operationId": "listTemplates", "responses": {"200": {"description": "Templates"}}}, "post": {"operationId": "createTemplate", "responses": {"201": {"description": "Created"}, "401": {"$ref": "#/components/responses/Unauthorized"}, "422": {"$ref": "#/components/responses/Validation"}}}}, "/uploads/presign": {"post": {"operationId": "createPresignedUpload", "responses": {"201": {"description": "Presigned URL"}, "422": {"$ref": "#/components/responses/Validation"}}}}},
-  "components": {"schemas": {"Problem": {"type": "object", "required": ["type", "title", "status"], "properties": {"type": {"type": "string"}, "title": {"type": "string"}, "status": {"type": "integer"}}}}, "responses": {"Unauthorized": {"description": "Unauthorized"}, "Validation": {"description": "Invalid MIME type or upload size"}}}
+ "openapi": "3.1.0",
+ "info": {
+  "title": "RSVP Template and Media API",
+  "version": "1.0.0",
+  "description": "Template/Media Service (lane 16, Django + DRF). Behind Kong at /media (prefix stripped). Errors are RFC 9457 problems."
+ },
+ "servers": [
+  {
+   "url": "http://localhost:8000/media"
+  }
+ ],
+ "security": [
+  {
+   "bearer": []
+  }
+ ],
+ "paths": {
+  "/health": {
+   "get": {
+    "security": [],
+    "responses": {
+     "200": {
+      "description": "Healthy"
+     }
+    }
+   }
+  },
+  "/ready": {
+   "get": {
+    "security": [],
+    "responses": {
+     "200": {
+      "description": "Database reachable"
+     },
+     "503": {
+      "description": "Not ready"
+     }
+    }
+   }
+  },
+  "/templates": {
+   "get": {
+    "operationId": "listTemplates",
+    "security": [],
+    "parameters": [
+     {
+      "name": "eventTypeTags",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "Comma separated compatibleTemplateTags of the event type; only PUBLISHED templates sharing one are returned"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Published templates",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/Template"
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "operationId": "createTemplate",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TemplateInput"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Created as DRAFT (ADMIN)",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Template"
+        }
+       }
+      },
+      "headers": {
+       "ETag": {
+        "description": "Aggregate version, to send back in If-Match",
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Body shape invalid",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or invalid RS256 bearer token",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Not an admin",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Invalid theme, layout, tags or sections",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/admin/templates": {
+   "get": {
+    "operationId": "listAllTemplates",
+    "responses": {
+     "200": {
+      "description": "Every template, any status (ADMIN)"
+     },
+     "403": {
+      "description": "Not an admin",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/templates/{templateId}": {
+   "get": {
+    "operationId": "getTemplate",
+    "security": [],
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/TemplateId"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Template",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Template"
+        }
+       }
+      },
+      "headers": {
+       "ETag": {
+        "description": "Aggregate version, to send back in If-Match",
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Unknown or not published",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "operationId": "editTemplate",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/TemplateId"
+     },
+     {
+      "name": "If-Match",
+      "in": "header",
+      "required": true,
+      "description": "Version being edited, e.g. \"3\". Missing → 428; stale → 409 VERSION_CONFLICT.",
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TemplateInput"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Edited (re-published if PUBLISHED)",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Template"
+        }
+       }
+      },
+      "headers": {
+       "ETag": {
+        "description": "Aggregate version, to send back in If-Match",
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Stale version or archived",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "428": {
+      "description": "If-Match required",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/templates/{templateId}/publish": {
+   "post": {
+    "operationId": "publishTemplate",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/TemplateId"
+     },
+     {
+      "name": "If-Match",
+      "in": "header",
+      "required": true,
+      "description": "Version being edited, e.g. \"3\". Missing → 428; stale → 409 VERSION_CONFLICT.",
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "PUBLISHED; emits template.template.published.v1",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Template"
+        }
+       }
+      },
+      "headers": {
+       "ETag": {
+        "description": "Aggregate version, to send back in If-Match",
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Invalid transition or stale version",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/templates/{templateId}/archive": {
+   "post": {
+    "operationId": "archiveTemplate",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/TemplateId"
+     },
+     {
+      "name": "If-Match",
+      "in": "header",
+      "required": true,
+      "description": "Version being edited, e.g. \"3\". Missing → 428; stale → 409 VERSION_CONFLICT.",
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "ARCHIVED (terminal); emits template.template.archived.v1",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Template"
+        }
+       }
+      },
+      "headers": {
+       "ETag": {
+        "description": "Aggregate version, to send back in If-Match",
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Invalid transition or stale version",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/templates/{templateId}/render-plan": {
+   "post": {
+    "operationId": "renderPlan",
+    "security": [],
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/TemplateId"
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "required": [
+         "enabledSections",
+         "content"
+        ],
+        "properties": {
+         "enabledSections": {
+          "type": "array",
+          "items": {
+           "type": "string"
+          }
+         },
+         "content": {
+          "type": "object"
+         }
+        }
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Visible and hidden sections; content returned untouched (REQ-16-05)"
+     }
+    }
+   }
+  },
+  "/uploads/presign": {
+   "post": {
+    "operationId": "createPresignedUpload",
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "required": [
+         "celebrationId",
+         "filename",
+         "contentType",
+         "sizeBytes"
+        ],
+        "properties": {
+         "celebrationId": {
+          "type": "string",
+          "format": "uuid"
+         },
+         "filename": {
+          "type": "string"
+         },
+         "contentType": {
+          "type": "string",
+          "enum": [
+           "image/jpeg",
+           "image/png",
+           "image/webp"
+          ]
+         },
+         "sizeBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10485760
+         }
+        }
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Presigned PUT straight to object storage",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UploadIntent"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing or invalid RS256 bearer token",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Read-only collaborator",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Unknown celebration or not yours",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Unsupported MIME type or size, checked before signing",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/uploads/{assetId}/complete": {
+   "post": {
+    "operationId": "completeUpload",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/AssetId"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Verified and PROCESSED with thumb, medium, full and webp variants",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MediaAsset"
+        }
+       }
+      }
+     },
+     "409": {
+      "description": "Nothing uploaded yet, or already completed",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Stored object does not match declared type/size, or is not an image",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/assets/{assetId}": {
+   "delete": {
+    "operationId": "deleteAsset",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/AssetId"
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Deleted with its variants"
+     },
+     "404": {
+      "description": "Unknown or not yours",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/celebrations/{celebrationId}/assets": {
+   "get": {
+    "operationId": "listAssets",
+    "parameters": [
+     {
+      "name": "celebrationId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Assets in gallery order",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "items": {
+           "type": "array",
+           "items": {
+            "$ref": "#/components/schemas/MediaAsset"
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Unknown or not yours",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/celebrations/{celebrationId}/assets/order": {
+   "put": {
+    "operationId": "reorderAssets",
+    "parameters": [
+     {
+      "name": "celebrationId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "required": [
+         "assetIds"
+        ],
+        "properties": {
+         "assetIds": {
+          "type": "array",
+          "items": {
+           "type": "string",
+           "format": "uuid"
+          }
+         },
+         "coverAssetId": {
+          "type": [
+           "string",
+           "null"
+          ],
+          "format": "uuid"
+         }
+        }
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "New order and cover"
+     },
+     "422": {
+      "description": "Every processed asset exactly once",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/public/celebrations/{celebrationId}/assets": {
+   "get": {
+    "operationId": "publicGallery",
+    "security": [],
+    "parameters": [
+     {
+      "name": "celebrationId",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Gallery of a published celebration; variant URLs are the stable /public/assets/{id}/{variant} links"
+     },
+     "404": {
+      "description": "Not published",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/public/assets/{assetId}/{variant}": {
+   "get": {
+    "operationId": "publicVariant",
+    "security": [],
+    "description": "Stable URL of a photo variant of a published celebration. Answers 302 to a fresh presigned URL; safe to embed in cached HTML and Open Graph cards.",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/AssetId"
+     },
+     {
+      "name": "variant",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "enum": [
+        "thumb",
+        "medium",
+        "full",
+        "webp"
+       ]
+      }
+     }
+    ],
+    "responses": {
+     "302": {
+      "description": "Redirect to object storage",
+      "headers": {
+       "Location": {
+        "schema": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "404": {
+      "description": "Unknown asset, variant, or celebration not published",
+      "content": {
+       "application/problem+json": {
+        "schema": {
+         "$ref": "#/components/schemas/Problem"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "securitySchemes": {
+   "bearer": {
+    "type": "http",
+    "scheme": "bearer",
+    "bearerFormat": "JWT (RS256, Identity JWKS)"
+   }
+  },
+  "parameters": {
+   "TemplateId": {
+    "name": "templateId",
+    "in": "path",
+    "required": true,
+    "schema": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "AssetId": {
+    "name": "assetId",
+    "in": "path",
+    "required": true,
+    "schema": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  },
+  "schemas": {
+   "Problem": {
+    "type": "object",
+    "required": [
+     "type",
+     "title",
+     "status"
+    ],
+    "properties": {
+     "type": {
+      "type": "string"
+     },
+     "title": {
+      "type": "string"
+     },
+     "status": {
+      "type": "integer"
+     },
+     "code": {
+      "type": "string"
+     },
+     "correlationId": {
+      "type": "string"
+     },
+     "missingFields": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Present on 422 PUBLISH_REQUIREMENTS_MISSING: exactly the fields the event type still requires"
+     }
+    },
+    "additionalProperties": true
+   },
+   "Theme": {
+    "type": "object",
+    "required": [
+     "palette",
+     "typography",
+     "sectionStyle"
+    ],
+    "properties": {
+     "palette": {
+      "type": "object",
+      "required": [
+       "canvas",
+       "surface",
+       "text",
+       "accent",
+       "muted"
+      ],
+      "additionalProperties": {
+       "type": "string",
+       "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+      }
+     },
+     "typography": {
+      "type": "object",
+      "required": [
+       "heading",
+       "body"
+      ],
+      "properties": {
+       "heading": {
+        "type": "string"
+       },
+       "body": {
+        "type": "string"
+       }
+      }
+     },
+     "sectionStyle": {
+      "type": "string",
+      "enum": [
+       "plain",
+       "cards",
+       "bands"
+      ]
+     }
+    }
+   },
+   "TemplateInput": {
+    "type": "object",
+    "required": [
+     "name",
+     "eventTypeTags",
+     "layout",
+     "theme",
+     "sectionOrder"
+    ],
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "eventTypeTags": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "layout": {
+      "type": "string",
+      "enum": [
+       "classic",
+       "minimal",
+       "editorial",
+       "festive",
+       "corporate"
+      ]
+     },
+     "theme": {
+      "$ref": "#/components/schemas/Theme"
+     },
+     "sectionOrder": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "Template": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TemplateInput"
+     },
+     {
+      "type": "object",
+      "properties": {
+       "id": {
+        "type": "string",
+        "format": "uuid"
+       },
+       "status": {
+        "type": "string",
+        "enum": [
+         "DRAFT",
+         "PUBLISHED",
+         "ARCHIVED"
+        ]
+       },
+       "version": {
+        "type": "integer"
+       },
+       "publishedAt": {
+        "type": [
+         "string",
+         "null"
+        ]
+       }
+      }
+     }
+    ]
+   },
+   "UploadIntent": {
+    "type": "object",
+    "properties": {
+     "assetId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "objectKey": {
+      "type": "string"
+     },
+     "uploadUrl": {
+      "type": "string",
+      "format": "uri"
+     },
+     "method": {
+      "const": "PUT"
+     },
+     "requiredHeaders": {
+      "type": "object"
+     },
+     "maxBytes": {
+      "type": "integer"
+     }
+    }
+   },
+   "MediaAsset": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "celebrationId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "filename": {
+      "type": "string"
+     },
+     "contentType": {
+      "type": "string"
+     },
+     "sizeBytes": {
+      "type": "integer"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "PENDING_UPLOAD",
+       "PROCESSED",
+       "REJECTED",
+       "DELETED"
+      ]
+     },
+     "width": {
+      "type": [
+       "integer",
+       "null"
+      ]
+     },
+     "height": {
+      "type": [
+       "integer",
+       "null"
+      ]
+     },
+     "sortOrder": {
+      "type": "integer"
+     },
+     "isCover": {
+      "type": "boolean"
+     },
+     "variants": {
+      "type": "object",
+      "properties": {
+       "thumb": {
+        "type": "string"
+       },
+       "medium": {
+        "type": "string"
+       },
+       "full": {
+        "type": "string"
+       },
+       "webp": {
+        "type": "string"
+       }
+      },
+      "description": "Presigned GET URLs"
+     }
+    }
+   }
+  }
+ }
 }
-

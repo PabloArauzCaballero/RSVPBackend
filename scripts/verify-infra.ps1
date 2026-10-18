@@ -37,7 +37,7 @@ $rabbitUser = if ($env:RABBITMQ_DEFAULT_USER) { $env:RABBITMQ_DEFAULT_USER } els
 $rabbitPassword = if ($env:RABBITMQ_DEFAULT_PASS) { $env:RABBITMQ_DEFAULT_PASS } else { 'local-rabbitmq-password' }
 $exchangeJson = & curl.exe --silent --show-error --fail --user "${rabbitUser}:${rabbitPassword}" 'http://localhost:15672/api/exchanges/%2F'
 if ($LASTEXITCODE -ne 0) { throw 'Could not inspect RabbitMQ topology.' }
-$exchangeNames = @($exchangeJson | ConvertFrom-Json | ForEach-Object name)
+$exchangeNames = @(($exchangeJson | ConvertFrom-Json).name)
 foreach ($exchange in $expectedExchanges) {
   if ($exchangeNames -notcontains $exchange) { throw "Expected RabbitMQ exchange '$exchange' was not loaded." }
 }

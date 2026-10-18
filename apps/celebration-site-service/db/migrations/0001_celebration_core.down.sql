@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS inbox_event;
+DROP TABLE IF EXISTS outbox_event;
+DROP TABLE IF EXISTS template_reference;
+DROP TABLE IF EXISTS celebration_audit;
+DROP TABLE IF EXISTS celebration_translations;
+DROP TABLE IF EXISTS celebration;
+DROP TABLE IF EXISTS event_type_translations;
+DROP TABLE IF EXISTS event_type_definition;
+DROP FUNCTION IF EXISTS app_flag(text);
+DROP FUNCTION IF EXISTS app_is_admin();
+DROP FUNCTION IF EXISTS app_organization_ids();
+DROP FUNCTION IF EXISTS app_user_id();

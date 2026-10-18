@@ -1,0 +1,13 @@
+{
+  "code": "BIRTHDAY",
+  "status": "ACTIVE",
+  "defaultLocale": "es-BO",
+  "hostRoles": ["CELEBRANT"],
+  "enabledSections": ["story", "schedule", "venues", "gallery", "faq", "gifts", "rsvp"],
+  "requiredFieldsForPublish": ["title", "eventDate", "venueName", "hosts.CELEBRANT"],
+  "compatibleTemplateTags": ["birthday"],
+  "translations": [
+    { "locale": "es-BO", "name": "Cumpleaños", "hostRoleLabels": { "CELEBRANT": "Cumpleañera o cumpleañero" } },
+    { "locale": "en-US", "name": "Birthday", "hostRoleLabels": { "CELEBRANT": "Birthday person" } }
+  ]
+}

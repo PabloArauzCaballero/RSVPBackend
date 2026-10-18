@@ -6,9 +6,31 @@
   "exports": "./dist/index.js",
   "rsvpRuntime": "node-nestjs",
   "scripts": {
-    "build": "yarn exec tsc -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "yarn clean && yarn exec tsc -p tsconfig.json",
     "lint": "yarn exec tsc -p tsconfig.json --noEmit",
     "test": "yarn build && node --test test/*.test.mjs",
+    "test:integration": "yarn build && node scripts/integration.mjs",
+    "coverage": "yarn build && node --enable-source-maps --test --experimental-test-coverage --test-coverage-include=src/** --test-coverage-include=dist/** --test-coverage-exclude=test/** --test-coverage-lines=80 --test-coverage-functions=80 test/*.test.mjs",
+    "start": "node dist/main.js",
+    "migrate": "node dist/cli.js migrate",
+    "seed": "node dist/cli.js seed",
+    "replay": "node dist/cli.js replay",
     "health": "node ../../scripts/workspace-check.mjs test"
+  },
+  "dependencies": {
+    "@rsvp/platform-auth": "workspace:*",
+    "@rsvp/platform-outbox": "workspace:*",
+    "@rsvp/platform-telemetry": "workspace:*",
+    "amqplib": "0.10.9",
+    "pg": "8.16.3",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@rsvp/gift-list-service": "workspace:*",
+    "@rsvp/guest-rsvp-service": "workspace:*",
+    "@types/amqplib": "0.10.7",
+    "@types/node": "24.7.2",
+    "@types/pg": "8.15.5"
   }
 }
