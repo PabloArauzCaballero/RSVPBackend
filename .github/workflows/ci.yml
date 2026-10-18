@@ -49,7 +49,7 @@ jobs:
       - run: yarn install --immutable
       - run: yarn workspace @rsvp/identity-service test
         if: matrix.runtime == 'java'
-      - run: yarn turbo run test --filter='@rsvp/*' --filter='!@rsvp/template-media-service'
+      - run: yarn turbo run test --filter='@rsvp/*' --filter='!@rsvp/template-media-service' --filter='!@rsvp/identity-service'
         if: matrix.runtime == 'node'
       - run: yarn turbo run test --filter='@rsvp/template-media-service'
         if: matrix.runtime == 'python'
