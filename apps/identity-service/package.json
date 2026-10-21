@@ -5,7 +5,7 @@
   "rsvpRuntime": "java21-spring-boot",
   "scripts": {
     "build": "node ../../scripts/identity-build.mjs build",
-    "lint": "node ../../scripts/identity-build.mjs build",
+    "lint": "node ../../scripts/identity-build.mjs lint",
     "test": "node ../../scripts/identity-build.mjs test",
     "health": "node ../../scripts/identity-build.mjs test"
   }

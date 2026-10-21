@@ -1,12 +1,13 @@
 // Runs the identity-service Gradle wrapper from the Yarn/Turbo pipeline.
 //   build → compile and package the Spring Boot jar (no tests)
+//   lint  → compile main and test sources (javac is the configured gate)
 //   test  → unit, ArchUnit and Testcontainers integration tests (needs Docker)
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../apps/identity-service/', import.meta.url));
-const tasks = { build: ['bootJar'], test: ['test'] };
+const tasks = { build: ['bootJar'], lint: ['compileJava', 'compileTestJava'], test: ['test'] };
 const mode = process.argv[2] ?? 'build';
 if (!tasks[mode]) {
   console.error(`Unknown mode "${mode}". Use one of: ${Object.keys(tasks).join(', ')}.`);

@@ -48,5 +48,9 @@ tasks.jacocoTestReport {
     reports { xml.required.set(true); html.required.set(true) }
 }
 
+// Explicit main class: Turbo runs build, lint and test in parallel, and scanning the class
+// output for main() while another Gradle process rewrites it fails intermittently.
+springBoot { mainClass.set("com.rsvp.identity.IdentityApplication") }
+
 tasks.bootJar { archiveFileName.set("identity-service.jar") }
 tasks.jar { enabled = false }
