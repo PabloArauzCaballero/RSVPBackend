@@ -1,0 +1,34 @@
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: ${IDENTITY_DATABASE_URL:jdbc:postgresql://localhost:5432/identity_db}
+    username: ${IDENTITY_DATABASE_USER:identity_owner}
+    password: ${IDENTITY_DATABASE_PASSWORD:local-identity-password}
+  flyway:
+    enabled: true
+  data:
+    redis:
+      url: ${IDENTITY_REDIS_URL:redis://localhost:6379}
+  jackson:
+    default-property-inclusion: always
+  main:
+    banner-mode: off
+
+identity:
+  jwt:
+    issuer: ${IDENTITY_JWT_ISSUER:rsvp-identity}
+    signing-key-pem: ${IDENTITY_SIGNING_KEY_PEM:}
+    signing-key-file: ${IDENTITY_SIGNING_KEY_FILE:}
+  password:
+    bcrypt-strength: ${IDENTITY_BCRYPT_STRENGTH:12}
+
+logging:
+  pattern:
+    level: "%5p [correlationId=%X{correlationId:-}]"
