@@ -31,3 +31,13 @@
 - **Conexiones que se caen no tumban el servicio.** El broker AMQP se reconecta solo y vuelve a declarar sus consumidores. En Postgres, el pool escucha los errores de conexiones inactivas y cada transacción escucha los de la conexión prestada; una conexión muerta se descarta en vez de volver al pool. Lo encontró el CI (`DROP DATABASE ... WITH (FORCE)` con el relay activo); la integración mata todas las conexiones del servicio y comprueba que sigue respondiendo.
 - **MinIO desde Chainguard** (`cgr.dev/chainguard/minio`, fijado por digest, `user: "0"` para escribir en un volumen nuevo): MinIO ya no publica imágenes gratuitas en Docker Hub ni en quay.io, y el digest anterior pedía autenticación.
 - **CI en `dev`**, igual que en RSVPFrontend; `corepack enable` va antes de `setup-node` (con `cache: yarn` corría Yarn 1 y fallaba todo).
+
+## Eje A (Pablo) · Identity · 2026-10-21
+
+- **Spring Boot 3.5 con Gradle wrapper**, `JdbcClient` y Flyway; sin JPA: el modelo es pequeño y el dominio queda libre de anotaciones (ArchUnit lo exige en `domain` y `application`).
+- **El registro inicia sesión** (201 con `accessToken`, `refreshToken`, `expiresIn`), porque así lo consume `IdentityClient.register` en RSVPFrontend.
+- **Roles autoasignables al registrarse: `HOST` (por defecto), `PLANNER` y `PROVIDER`.** `ADMIN` nunca. Ninguno da acceso a datos por sí solo: un planner solo alcanza celebraciones de sus `organizationIds`, y un proveedor pasa por la verificación del catálogo.
+- **`kid` = huella RFC 7638 de la clave pública.** El mismo PEM conserva el `kid` tras reiniciar; una clave nueva obtiene otro y los consumidores recargan el JWKS al no encontrarlo.
+- **Contraseñas:** política por longitud (12–128 caracteres, máximo 72 bytes por BCrypt), BCrypt coste 12. Un e-mail desconocido compara contra un hash señuelo para no revelar cuentas por tiempo; los tres fallos de login responden igual.
+- **Refresh en Redis con AOF**, guardado por SHA-256. `HSETNX` marca el consumo de forma atómica: de dos rotaciones simultáneas solo una gana y la otra revoca la cadena.
+- **Testcontainers 1.21.4** (fijado por encima del BOM de Boot): 1.21.3 no habla la API mínima de Docker Engine 29.

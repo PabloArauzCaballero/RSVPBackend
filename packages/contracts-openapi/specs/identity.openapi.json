@@ -1,5 +1,513 @@
 {
-  "openapi": "3.1.0", "info": {"title": "RSVP Identity API", "version": "1.0.0"}, "servers": [{"url": "http://localhost:8000/identity"}],
-  "paths": {"/health": {"get": {"operationId": "identityHealth", "responses": {"200": {"description": "Healthy"}}}}, "/auth/register": {"post": {"operationId": "registerUser", "responses": {"201": {"description": "Registered"}, "409": {"$ref": "#/components/responses/Conflict"}, "422": {"$ref": "#/components/responses/Validation"}}}}, "/auth/login": {"post": {"operationId": "login", "responses": {"200": {"description": "Session"}, "401": {"$ref": "#/components/responses/Unauthorized"}}}}, "/auth/refresh": {"post": {"operationId": "refreshSession", "responses": {"200": {"description": "Rotated session"}, "401": {"$ref": "#/components/responses/Unauthorized"}}}}, "/auth/password-recovery": {"post": {"operationId": "requestPasswordRecovery", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PasswordRecoveryRequest"}}}}, "responses": {"202": {"description": "Accepted. This response is identical whether or not the account exists."}, "422": {"$ref": "#/components/responses/Validation"}}}}, "/auth/logout": {"post": {"operationId": "logout", "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LogoutRequest"}}}}, "responses": {"204": {"description": "Refresh-token chain revoked"}, "422": {"$ref": "#/components/responses/Validation"}}}}, "/.well-known/jwks.json": {"get": {"operationId": "jwks", "responses": {"200": {"description": "JWKS"}}}}},
-  "components": {"schemas": {"Problem": {"type": "object", "required": ["type", "title", "status"], "properties": {"type": {"type": "string"}, "title": {"type": "string"}, "status": {"type": "integer"}, "correlationId": {"type": "string", "format": "uuid"}}}, "PasswordRecoveryRequest": {"type": "object", "additionalProperties": false, "required": ["email"], "properties": {"email": {"type": "string", "format": "email", "maxLength": 320}}}, "LogoutRequest": {"type": "object", "additionalProperties": false, "required": ["refreshToken"], "properties": {"refreshToken": {"type": "string", "minLength": 32, "maxLength": 4096}}}}, "responses": {"Unauthorized": {"description": "Authentication failed"}, "Conflict": {"description": "Resource conflict"}, "Validation": {"description": "Validation failed"}}}
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RSVP Identity API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/identity"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "identityHealth",
+        "responses": {
+          "200": {
+            "description": "Healthy"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "registerUser",
+        "responses": {
+          "201": {
+            "description": "Registered and signed in",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Registration"
+                }
+              }
+            }
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/Validation"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "login",
+        "responses": {
+          "200": {
+            "description": "Session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/Validation"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "refreshSession",
+        "responses": {
+          "200": {
+            "description": "Rotated session. Reusing a consumed refresh token revokes its whole chain and returns 401.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/Validation"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/password-recovery": {
+      "post": {
+        "operationId": "requestPasswordRecovery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordRecoveryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted. This response is identical whether or not the account exists."
+          },
+          "422": {
+            "$ref": "#/components/responses/Validation"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Refresh-token chain revoked"
+          },
+          "422": {
+            "$ref": "#/components/responses/Validation"
+          }
+        }
+      }
+    },
+    "/.well-known/jwks.json": {
+      "get": {
+        "operationId": "jwks",
+        "responses": {
+          "200": {
+            "description": "JWKS (RFC 7517). kid is the RFC 7638 thumbprint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Jwks"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Problem": {
+        "type": "object",
+        "required": [
+          "type",
+          "title",
+          "status"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "correlationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "field",
+                "message"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PasswordRecoveryRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 320
+          }
+        }
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 4096
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 320
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 320
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 128,
+            "description": "Length-based policy; at most 72 UTF-8 bytes."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "HOST",
+              "PLANNER",
+              "PROVIDER"
+            ],
+            "default": "HOST",
+            "description": "ADMIN is never self-service."
+          }
+        }
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 4096
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "tokenType",
+          "expiresIn"
+        ],
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "RS256 JWT. Claims: iss, sub, roles[], organizationIds[], iat, exp, jti."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Opaque, single use, 30 days."
+          },
+          "tokenType": {
+            "const": "Bearer"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "const": 900
+          }
+        }
+      },
+      "Registration": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Session"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "email",
+              "roles"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "HOST",
+                    "PLANNER",
+                    "PROVIDER"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Jwks": {
+        "type": "object",
+        "required": [
+          "keys"
+        ],
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "kty",
+                "kid",
+                "use",
+                "alg",
+                "n",
+                "e"
+              ],
+              "properties": {
+                "kty": {
+                  "const": "RSA"
+                },
+                "kid": {
+                  "type": "string"
+                },
+                "use": {
+                  "const": "sig"
+                },
+                "alg": {
+                  "const": "RS256"
+                },
+                "n": {
+                  "type": "string"
+                },
+                "e": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "AccessTokenClaims": {
+        "type": "object",
+        "description": "Payload of accessToken, consumed by every service.",
+        "required": [
+          "iss",
+          "sub",
+          "roles",
+          "organizationIds",
+          "iat",
+          "exp"
+        ],
+        "properties": {
+          "iss": {
+            "type": "string"
+          },
+          "sub": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ADMIN",
+                "HOST",
+                "PLANNER",
+                "PROVIDER"
+              ]
+            }
+          },
+          "organizationIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "iat": {
+            "type": "integer"
+          },
+          "exp": {
+            "type": "integer"
+          },
+          "jti": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication failed",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Resource conflict",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "Validation": {
+        "description": "Validation failed",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      }
+    }
+  }
 }

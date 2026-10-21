@@ -1,0 +1,214 @@
+
+▶ docker compose --profile apps up (identity + celebration + kong)
+ Image rsvpbackend-identity-service Building 
+ Image rsvpbackend-celebration-site-service Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.22kB 0.0s done
+#1 DONE 0.0s
+
+#2 [identity-service internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.09kB 0.0s done
+#2 DONE 0.1s
+
+#3 [celebration-site-service internal] load build definition from Dockerfile
+#3 transferring dockerfile: 974B 0.0s done
+#3 DONE 0.1s
+
+#4 [celebration-site-service internal] load metadata for docker.io/library/node:24.18.1-alpine
+#4 ...
+
+#5 [identity-service internal] load metadata for docker.io/library/eclipse-temurin:21.0.8_9-jdk-noble
+#5 ...
+
+#6 [identity-service internal] load metadata for docker.io/library/eclipse-temurin:21.0.8_9-jre-noble
+#6 DONE 23.9s
+
+#4 [celebration-site-service internal] load metadata for docker.io/library/node:24.18.1-alpine
+#4 DONE 23.9s
+
+#5 [identity-service internal] load metadata for docker.io/library/eclipse-temurin:21.0.8_9-jdk-noble
+#5 DONE 24.0s
+
+#7 [identity-service internal] load .dockerignore
+#7 transferring context: 271B 0.0s done
+#7 DONE 0.0s
+
+#8 [identity-service internal] load build context
+#8 DONE 0.0s
+
+#9 [celebration-site-service internal] load build context
+#9 DONE 0.0s
+
+#10 [identity-service stage-1 1/4] FROM docker.io/library/eclipse-temurin:21.0.8_9-jre-noble@sha256:20e7f7288e1c18eebe8f06a442c9f7183342d9b022d3b9a9677cae2b558ddddd
+#10 resolve docker.io/library/eclipse-temurin:21.0.8_9-jre-noble@sha256:20e7f7288e1c18eebe8f06a442c9f7183342d9b022d3b9a9677cae2b558ddddd 0.1s done
+#10 DONE 0.1s
+
+#11 [identity-service build 1/7] FROM docker.io/library/eclipse-temurin:21.0.8_9-jdk-noble@sha256:03b731a231066bd04ada0a7ee9003cdbc1460083344f9277245b233e5ffcbf47
+#11 resolve docker.io/library/eclipse-temurin:21.0.8_9-jdk-noble@sha256:03b731a231066bd04ada0a7ee9003cdbc1460083344f9277245b233e5ffcbf47 0.1s done
+#11 DONE 0.1s
+
+#12 [celebration-site-service build 1/9] FROM docker.io/library/node:24.18.1-alpine@sha256:f70403e87646dc51b45295f4b8b70cdad0b63d2297c4c9899119b03f7af7a6b3
+#12 resolve docker.io/library/node:24.18.1-alpine@sha256:f70403e87646dc51b45295f4b8b70cdad0b63d2297c4c9899119b03f7af7a6b3 0.1s done
+#12 DONE 0.1s
+
+#8 [identity-service internal] load build context
+#8 transferring context: 6.27kB 0.1s done
+#8 DONE 0.1s
+
+#13 [identity-service stage-1 2/4] RUN useradd --system --uid 10001 identity
+#13 CACHED
+
+#14 [identity-service build 4/7] COPY apps/identity-service/gradle ./gradle
+#14 CACHED
+
+#15 [identity-service build 7/7] RUN ./gradlew --no-daemon --console=plain bootJar
+#15 CACHED
+
+#16 [identity-service stage-1 3/4] WORKDIR /app
+#16 CACHED
+
+#17 [identity-service build 2/7] WORKDIR /src
+#17 CACHED
+
+#18 [identity-service build 3/7] COPY apps/identity-service/gradlew apps/identity-service/settings.gradle.kts apps/identity-service/build.gradle.kts ./
+#18 CACHED
+
+#19 [identity-service build 5/7] RUN chmod +x gradlew && ./gradlew --no-daemon --console=plain dependencies > /dev/null
+#19 CACHED
+
+#20 [identity-service build 6/7] COPY apps/identity-service/src ./src
+#20 CACHED
+
+#21 [identity-service stage-1 4/4] COPY --from=build /src/build/libs/identity-service.jar ./identity-service.jar
+#21 CACHED
+
+#22 [identity-service] exporting to image
+#22 exporting layers 0.0s done
+#22 exporting manifest sha256:91f25cb37335ead0b0077d10bbc1223db25a01d20fd4815713f951c7d7b993ca done
+#22 exporting config sha256:ef6ccd8386f5d1713f73b2b4b5e722f82c7ea39413a2f1459323645c6b72d13f done
+#22 exporting attestation manifest sha256:f49c2336b3febbb7c8cc6b0d9998e5fb66943a135c9711e27e1cc0b6a19cff57
+#22 ...
+
+#9 [celebration-site-service internal] load build context
+#9 transferring context: 703.09kB 0.2s done
+#9 DONE 0.2s
+
+#23 [celebration-site-service build 4/9] COPY package.json yarn.lock .yarnrc.yml tsconfig.base.json turbo.json ./
+#23 CACHED
+
+#24 [celebration-site-service build 2/9] WORKDIR /repo
+#24 CACHED
+
+#25 [celebration-site-service build 8/9] RUN yarn turbo run build --filter=@rsvp/celebration-site-service...
+#25 CACHED
+
+#26 [celebration-site-service stage-1 3/6] COPY --from=build /repo/node_modules ./node_modules
+#26 CACHED
+
+#27 [celebration-site-service build 6/9] COPY apps ./apps
+#27 CACHED
+
+#28 [celebration-site-service build 9/9] RUN yarn workspaces focus @rsvp/celebration-site-service --production
+#28 CACHED
+
+#29 [celebration-site-service build 7/9] RUN yarn install --immutable
+#29 CACHED
+
+#30 [celebration-site-service stage-1 4/6] COPY --from=build /repo/packages ./packages
+#30 CACHED
+
+#31 [celebration-site-service stage-1 5/6] COPY --from=build /repo/apps/celebration-site-service ./apps/celebration-site-service
+#31 CACHED
+
+#32 [celebration-site-service build 5/9] COPY packages ./packages
+#32 CACHED
+
+#33 [celebration-site-service build 3/9] RUN corepack enable
+#33 CACHED
+
+#34 [celebration-site-service stage-1 6/6] WORKDIR /repo/apps/celebration-site-service
+#34 CACHED
+
+#22 [identity-service] exporting to image
+#22 exporting attestation manifest sha256:f49c2336b3febbb7c8cc6b0d9998e5fb66943a135c9711e27e1cc0b6a19cff57 0.1s done
+#22 exporting manifest list sha256:a0a9376c04abff7fe6c5cd0a85ee77ccaad896696454f7258e044fa2fd787401 0.0s done
+#22 naming to docker.io/library/rsvpbackend-identity-service:latest done
+#22 unpacking to docker.io/library/rsvpbackend-identity-service:latest 0.0s done
+#22 DONE 0.3s
+
+#35 [celebration-site-service] exporting to image
+#35 exporting layers done
+#35 exporting manifest sha256:23819607c90ef38c1561221cc533533febf97da4db5c86501c0f170450098271 done
+#35 exporting config sha256:c36e8799d174280479f8d830d11d2cc5a03a9903549b6634b1614ee182c74cad done
+#35 exporting attestation manifest sha256:b896ee7d004edacfafb66abef77af7c7c10218ffb3e797bd3d099ab953ad4ac3 0.1s done
+#35 exporting manifest list sha256:acc443379b4a66ce82ffa6e5d55ddde3156b211911d2045f544163ef67982545 0.0s done
+#35 naming to docker.io/library/rsvpbackend-celebration-site-service:latest 0.0s done
+#35 unpacking to docker.io/library/rsvpbackend-celebration-site-service:latest 0.0s done
+#35 DONE 0.3s
+
+#36 [identity-service] resolving provenance for metadata file
+#36 DONE 0.0s
+
+#37 [celebration-site-service] resolving provenance for metadata file
+#37 DONE 0.0s
+ Image rsvpbackend-celebration-site-service Built 
+ Image rsvpbackend-identity-service Built 
+ Container rsvpbackend-postgres-1 Running 
+ Container rsvpbackend-redis-1 Running 
+ Container rsvpbackend-rabbitmq-1 Running 
+ Container rsvpbackend-kong-1 Running 
+ Container rsvpbackend-identity-service-1 Recreate 
+ Container rsvpbackend-celebration-site-service-1 Recreate 
+ Container rsvpbackend-celebration-site-service-1 Recreated 
+ Container rsvpbackend-identity-service-1 Recreated 
+ Container rsvpbackend-redis-1 Waiting 
+ Container rsvpbackend-postgres-1 Waiting 
+ Container rsvpbackend-rabbitmq-1 Waiting 
+ Container rsvpbackend-postgres-1 Waiting 
+ Container rsvpbackend-postgres-1 Waiting 
+ Container rsvpbackend-redis-1 Healthy 
+ Container rsvpbackend-postgres-1 Healthy 
+ Container rsvpbackend-postgres-1 Healthy 
+ Container rsvpbackend-identity-service-1 Starting 
+ Container rsvpbackend-rabbitmq-1 Healthy 
+ Container rsvpbackend-celebration-site-service-1 Starting 
+ Container rsvpbackend-postgres-1 Healthy 
+ Container rsvpbackend-identity-service-1 Started 
+ Container rsvpbackend-celebration-site-service-1 Started 
+ Container rsvpbackend-postgres-1 Waiting 
+ Container rsvpbackend-redis-1 Waiting 
+ Container rsvpbackend-rabbitmq-1 Waiting 
+ Container rsvpbackend-identity-service-1 Waiting 
+ Container rsvpbackend-celebration-site-service-1 Waiting 
+ Container rsvpbackend-kong-1 Waiting 
+ Container rsvpbackend-kong-1 Healthy 
+ Container rsvpbackend-rabbitmq-1 Healthy 
+ Container rsvpbackend-postgres-1 Healthy 
+ Container rsvpbackend-redis-1 Healthy 
+ Container rsvpbackend-celebration-site-service-1 Healthy 
+ Container rsvpbackend-identity-service-1 Healthy 
+
+▶ health and JWKS through Kong
+  ✔ GET /identity/.well-known/jwks.json → 200 — kid AsxhoWHbcrrhJD3O5IMQOl2xfOidRnvEoPZfmAfF6dA
+
+▶ register and log in
+  ✔ POST /identity/auth/register → 201 with session — roles HOST
+  ✔ self-service ADMIN → 422
+  ✔ same e-mail in upper case → 409
+  ✔ short password → 422 problem+json
+  ✔ wrong password → 401
+  ✔ POST /identity/auth/login → 200 — claims sub, roles ["HOST"], organizationIds [], 15 min
+
+▶ the Identity token opens Celebration (JWKS fetched from Identity)
+  ✔ no token → 401
+  ✔ POST /celebrations with Identity token → 201 — id 88099466-66c8-4474-8e15-b76d423ac713
+  ✔ owner reads it → 200
+  ✔ one changed signature byte → 401
+  ✔ another real user → 404 (tenant isolation)
+
+▶ refresh rotation, reuse detection and logout
+  ✔ refresh → 200, new refresh token
+  ✔ reusing the old token → 401 and the whole chain is revoked
+  ✔ logout → 204, then refresh → 401
+
+Identity live check passed.

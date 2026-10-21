@@ -1,21 +1,18 @@
-import { readdir } from 'node:fs/promises';
+// Runs the identity-service Gradle wrapper from the Yarn/Turbo pipeline.
+//   build → compile and package the Spring Boot jar (no tests)
+//   lint  → compile main and test sources (javac is the configured gate)
+//   test  → unit, ArchUnit and Testcontainers integration tests (needs Docker)
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../apps/identity-service/', import.meta.url));
-async function javaFiles(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const nested = await Promise.all(entries.map((entry) => entry.isDirectory() ? javaFiles(join(directory, entry.name)) : entry.name.endsWith('.java') ? [join(directory, entry.name)] : []));
-  return nested.flat();
+const tasks = { build: ['bootJar'], lint: ['compileJava', 'compileTestJava'], test: ['test'] };
+const mode = process.argv[2] ?? 'build';
+if (!tasks[mode]) {
+  console.error(`Unknown mode "${mode}". Use one of: ${Object.keys(tasks).join(', ')}.`);
+  process.exit(2);
 }
-const main = await javaFiles(join(root, 'src/main/java'));
-const test = await javaFiles(join(root, 'src/test/java'));
-const build = join(root, 'build/classes');
-const compile = spawnSync('javac', ['--release', '21', '-d', build, ...main, ...test], { stdio: 'inherit' });
-if (compile.status !== 0) process.exit(compile.status ?? 1);
-if (process.argv[2] === 'test') {
-  const run = spawnSync('java', ['-ea', '-cp', build, 'com.rsvp.identity.IdentityServiceTest'], { stdio: 'inherit' });
-  process.exit(run.status ?? 1);
-}
-console.log(`Compiled ${main.length} identity sources and ${test.length} tests.`);
+const windows = process.platform === 'win32';
+const result = spawnSync(windows ? `"${join(root, 'gradlew.bat')}"` : 'sh', [...(windows ? [] : ['./gradlew']), ...tasks[mode], '--no-daemon', '--console=plain'], { cwd: root, stdio: 'inherit', shell: windows });
+process.exit(result.status ?? 1);

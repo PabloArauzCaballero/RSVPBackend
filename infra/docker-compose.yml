@@ -144,6 +144,23 @@ services:
     ports: ["3000:3000"]
     depends_on: [prometheus, tempo, loki]
 
+  # --- Eje A (Pablo): Identity. `docker compose --profile apps up -d --build identity-service` ---
+  identity-service:
+    profiles: ["apps"]
+    build: {context: .., dockerfile: apps/identity-service/Dockerfile}
+    environment:
+      IDENTITY_DATABASE_URL: jdbc:postgresql://postgres:5432/identity_db
+      IDENTITY_DATABASE_USER: identity_owner
+      IDENTITY_DATABASE_PASSWORD: ${IDENTITY_OWNER_PASSWORD:-local-identity-password}
+      IDENTITY_REDIS_URL: redis://redis:6379
+      IDENTITY_JWT_ISSUER: rsvp-identity
+      # PKCS#8 PEM. Empty → ephemeral key: tokens stop validating when the container restarts.
+      IDENTITY_SIGNING_KEY_PEM: ${IDENTITY_SIGNING_KEY_PEM:-}
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    ports: ["8080:8080"]
+
   # --- Eje B (Leo): run with `docker compose --profile apps up -d --build` ------------------
   celebration-site-service:
     profiles: ["apps"]
